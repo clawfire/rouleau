@@ -87,7 +87,7 @@ State of Rouleau on 26 Oct 2026 (after the first local Claude Code session).
 
 ### Performance: still to do
 
-1. **Bundle**: one 468 kB JS file (122 kB gzip) is loaded up front even though a visit uses one module. ical.js alone is ~78 kB minified, plus qrcode-generator and every module and drawing file. Lazy-load: the module registry keeps the metadata (id, label, icon, group) and a `() => import()`; `calendar.js` imports `ical.js` on first use. `selectModule` becomes async.
+1. **Bundle**: one 561 kB JS file (151 kB gzip, and growing with every module) is loaded up front even though a visit uses one module. ical.js alone is ~78 kB minified, plus qrcode-generator and every module and drawing file. Lazy-load: the module registry keeps the metadata (id, label, icon, group) and a `() => import()`; `calendar.js` imports `ical.js` on first use. `selectModule` becomes async.
 2. **Self-host the theme fonts and the icons** (also fixes offline, privacy and the CSP): 17 separate SVG requests and a third-party CSS import at start-up. Fonts via `@fontsource`, icons via a local icon library (`registerIconLibrary`) with the ~20 SVGs actually used.
 3. `store.set` serialises all values (including a ~30 KB photo) on every keystroke: debounce by ~300 ms.
 4. `workout.js` calls `clearHevyCache()` each time the controls are rebuilt, so flipping a radio re-downloads routines and workouts. Use a TTL cache like the calendar one.
