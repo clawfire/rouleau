@@ -2,11 +2,12 @@
 
 A small web app that generates things to print on a **Phomemo T02** thermal printer (48 mm paper, 384 dots, 203 dpi): font specimens today; morning tickets, workout sheets, task tickets, puzzles and more tomorrow.
 
-Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome](https://webawesome.com) components. Everything is self-hosted and open source: no account, no tracking, works offline (except the icon CDN).
+Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, works offline (except the icon CDN).
 
 ## Quick start
 
 ```bash
+cp .npmrc.example .npmrc   # Web Awesome Pro token, see below
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # static site in dist/, deployable anywhere
@@ -96,14 +97,16 @@ Block builders: `text`, `row` (key ……… value), `rule` (`solid` · `dashed`
 
 Print the **Spécimen de fonts** ticket to pick yours on real paper. Rule of thumb: ≥ 18 px (≈ 2.2 mm) and weight ≥ 500 for body text.
 
-## Web Awesome Pro (optional)
+## Web Awesome Pro
+
+Rouleau uses **Web Awesome Pro** (Brutalist theme). Installing needs a Pro token:
 
 ```bash
-cp .npmrc.example .npmrc          # paste your token, never commit it
-npm install @awesome.me/webawesome-pro   # exact name in your workspace
+cp .npmrc.example .npmrc   # paste your token from webawesome.com/workspaces, never commit it
+npm install
 ```
 
-Then swap the import in `src/main.js` to the Pro package and set the theme on `<html>` in `index.html`, e.g. `class="wa-theme-brutalist wa-palette-default"`.
+The lockfile points the `@awesome.me` scope at the Pro registry on Cloudsmith; tarballs are served from `dl.fontawesome.com`.
 
 ## Working with AI agents
 

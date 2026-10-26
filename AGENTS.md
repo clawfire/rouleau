@@ -10,9 +10,9 @@
 
 - UI is built with **Web Awesome**. The owner has a Pro licence: Pro themes (e.g. Brutalist) and components are fine once the Pro package is installed (see webawesome.com workspaces, token in a git-ignored .npmrc).
 - Before touching UI, read the skills shipped in `node_modules`:
-  - `node_modules/@awesome.me/webawesome/dist/skills/webawesome/` (component APIs)
-  - `node_modules/@awesome.me/webawesome/dist/skills/webawesome-design/` (layout, tokens, theming)
-- Theme: `wa-theme-default` + `wa-palette-default`, light/dark follows the OS (`src/main.js`).
+  - `node_modules/@awesome.me/webawesome-pro/dist/skills/webawesome/` (component APIs)
+  - `node_modules/@awesome.me/webawesome-pro/dist/skills/webawesome-design/` (layout, tokens, theming)
+- Theme: `wa-theme-brutalist` (Pro) + `wa-palette-default`, light/dark follows the OS (`src/main.js`). Brutalist loads its fonts from fonts.bunny.net.
 - Use `--wa-*` tokens and `wa-*` layout utilities. Only literal colours allowed: `--paper` and the ink in `src/styles.css`.
 - Use short size values (`size="s"`), long ones are deprecated.
 

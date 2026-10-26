@@ -3,25 +3,26 @@
  * Picks a module, renders its controls, rebuilds the ticket on every change,
  * and sends the result to the T02 (Bluetooth, ⌘P or PNG).
  */
-import '@awesome.me/webawesome/dist/styles/webawesome.css';
-import '@awesome.me/webawesome/dist/components/page/page.js';
-import '@awesome.me/webawesome/dist/components/button/button.js';
-import '@awesome.me/webawesome/dist/components/icon/icon.js';
-import '@awesome.me/webawesome/dist/components/tag/tag.js';
-import '@awesome.me/webawesome/dist/components/badge/badge.js';
-import '@awesome.me/webawesome/dist/components/card/card.js';
-import '@awesome.me/webawesome/dist/components/callout/callout.js';
-import '@awesome.me/webawesome/dist/components/spinner/spinner.js';
-import '@awesome.me/webawesome/dist/components/input/input.js';
-import '@awesome.me/webawesome/dist/components/textarea/textarea.js';
-import '@awesome.me/webawesome/dist/components/slider/slider.js';
-import '@awesome.me/webawesome/dist/components/switch/switch.js';
-import '@awesome.me/webawesome/dist/components/checkbox/checkbox.js';
-import '@awesome.me/webawesome/dist/components/checkbox-group/checkbox-group.js';
-import '@awesome.me/webawesome/dist/components/radio-group/radio-group.js';
-import '@awesome.me/webawesome/dist/components/radio/radio.js';
-import '@awesome.me/webawesome/dist/components/select/select.js';
-import '@awesome.me/webawesome/dist/components/option/option.js';
+import '@awesome.me/webawesome-pro/dist/styles/webawesome.css';
+import '@awesome.me/webawesome-pro/dist/styles/themes/brutalist.css';
+import '@awesome.me/webawesome-pro/dist/components/page/page.js';
+import '@awesome.me/webawesome-pro/dist/components/button/button.js';
+import '@awesome.me/webawesome-pro/dist/components/icon/icon.js';
+import '@awesome.me/webawesome-pro/dist/components/tag/tag.js';
+import '@awesome.me/webawesome-pro/dist/components/badge/badge.js';
+import '@awesome.me/webawesome-pro/dist/components/card/card.js';
+import '@awesome.me/webawesome-pro/dist/components/callout/callout.js';
+import '@awesome.me/webawesome-pro/dist/components/spinner/spinner.js';
+import '@awesome.me/webawesome-pro/dist/components/input/input.js';
+import '@awesome.me/webawesome-pro/dist/components/textarea/textarea.js';
+import '@awesome.me/webawesome-pro/dist/components/slider/slider.js';
+import '@awesome.me/webawesome-pro/dist/components/switch/switch.js';
+import '@awesome.me/webawesome-pro/dist/components/checkbox/checkbox.js';
+import '@awesome.me/webawesome-pro/dist/components/checkbox-group/checkbox-group.js';
+import '@awesome.me/webawesome-pro/dist/components/radio-group/radio-group.js';
+import '@awesome.me/webawesome-pro/dist/components/radio/radio.js';
+import '@awesome.me/webawesome-pro/dist/components/select/select.js';
+import '@awesome.me/webawesome-pro/dist/components/option/option.js';
 import './fonts.js';
 import './styles.css';
 
