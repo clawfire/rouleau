@@ -11,6 +11,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
     - *Bilan*: last (or chosen) Hevy workout, totals grid + PRs; formats *Court* (default, ~7 cm) and *Complet*
     - *Vierge*: no Hevy, N exercises × M sets with kg / reps / effort fields
   - **Spécimen de fonts** (`src/modules/specimen.js`)
+  - **Badges** (`src/modules/badge.js` + `badge-draw.js`): conference / visitor / hello, 48 mm tall by 60–160 mm long, printed sideways; optional dithered photo and QR; flat preview via `turn()` in `main.js`
   - **QR utilitaires** (`src/modules/qr.js`, payloads + matrix in `src/services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
   - **Ticket du matin** (`src/modules/morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable
 - UI: Web Awesome Pro, Brutalist theme. Preview shows 4 mm of paper on each side of the 48 mm print.
@@ -36,6 +37,9 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 
 ## Still untested
 
+- [ ] Badges on real tape: which end should come out first (cw / ccw), a 3-dot-module vCard QR, the dithered photo at 230 dots, the black bands at max density
+- [ ] Badge photo from a real camera / phone (EXIF rotation relies on `createImageBitmap`)
+
 - [ ] QR codes on real paper with a phone camera (decoded fine from the rendered bitmaps, never scanned off a printed ticket; try 3-dot modules, correction M vs Q)
 - [ ] QR types never opened on a real phone: SMSTO, WhatsApp, geo, vCard import on iOS and Android
 
@@ -57,7 +61,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 2. Tickets de tâches: GitHub/Jira issue → ticket with Octicons (MIT), mono font, QR to the issue
 3. Ticket de focus · L'oracle (quick wins)
 4. Jeux: sudoku, Star Battle (Queens-like), Numberlink (Zip-like), unique solution via solver; patterns instead of colours
-5. ~~QR utilitaires~~ done · Badges (reuse `qr-payload.js` for the vCard QR) (name, role, dithered photo, vCard QR, CSV import)
+5. ~~QR utilitaires~~ done · ~~Badges~~ done (still to do: CSV import to print a batch of badges, a lanyard-hole marker) (name, role, dithered photo, vCard QR, CSV import)
 6. Labo photo: brightness / contrast / gamma + dither choice, stickers & text, webcam photo-booth strip
 
 ## Setup reminder

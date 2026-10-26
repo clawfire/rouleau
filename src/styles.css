@@ -127,6 +127,18 @@ a.nav-item[aria-current='page'] wa-icon {
     conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--tooth) 51% repeat-x;
 }
 
+/* Sideways tickets (badges) are previewed flat: the strip lies along the screen, the 4 mm unprintable
+   bands run along the long edges, and the paper is cut straight at both ends. */
+.paper[data-flat='true'] {
+  mask: none;
+  padding-block: calc(var(--ticket-w) * 4 / 48);
+  padding-inline: var(--wa-space-s);
+}
+
+.paper[data-flat='true'] #ticket {
+  inline-size: min(calc(var(--ticket-w) * var(--flat-ratio, 1)), calc(100cqi - var(--wa-space-3xl)));
+}
+
 .paper-shadow {
   filter: drop-shadow(0 var(--wa-space-2xs) var(--wa-space-s) var(--paper-shadow));
 }

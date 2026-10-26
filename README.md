@@ -50,7 +50,8 @@ src/
 │   ├── index.js       # registry (+ roadmap entries)
 │   ├── specimen.js    # font specimen ticket
 │   ├── morning.js     # weather + agenda + priorities + quote
-│   └── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
+│   ├── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
+│   └── badge.js       # sideways badges (+ badge-draw.js)
 ├── ui/controls.js     # control schema → Web Awesome form components
 ├── fonts.js           # font registry (all SIL OFL)
 └── main.js            # app shell
@@ -82,7 +83,7 @@ export default {
 
 Then add it to `MODULES` in `src/modules/index.js`. `build` may be `async` (fetch an API, load an image…).
 
-Control types: `text`, `textarea`, `slider`, `switch`, `checkboxes`, `radio`, `select`.
+Control types: `text`, `textarea`, `slider`, `switch`, `checkboxes`, `radio`, `select`, `image` (shrunk JPEG data URL), `button`, `callout`. A module can export `turn(values)` (`'cw'` | `'ccw'`) when it prints sideways: the preview then shows the ticket upright and flat.
 
 Block builders: `text` (options include `invert` for black bands, `frame` for outlined ones), `check` (drawn checkbox row, optional write-in line), `lines` (handwriting lines), `row` (key ……… value), `rule` (`solid` · `dashed` · `dotted` · `zigzag`), `space`, `image` (dithered), `gradient`, `draw` (raw Canvas 2D).
 
@@ -117,6 +118,16 @@ Wi-Fi, contact (vCard), link, free text, SMS, call, e-mail, WhatsApp, GPS positi
 - Size in mm and error correction (L / M / Q / H) are adjustable; a dense code (a full vCard is 69 × 69 modules) comes out larger than requested rather than unreadable.
 - The useful details are printed under the code (network and password, name and number…), so the paper still makes sense without scanning it.
 - Checked end to end: every payload type, at every correction level, and the rendered ticket bitmaps decode back to the exact payload (jsQR), including at half resolution.
+
+### Badges
+
+Conference, visitor or "HELLO my name is" badges. The strip is as wide as the print head (384 dots), so the **badge height is fixed at 48 mm** and you only choose its **length** (60–160 mm): the badge is drawn lying down, then turned 90° onto the ticket so its long side runs along the tape. Pick which end comes out first with *Sens sur le papier*.
+
+- **Conférence**: event and date in a black band, big first name, last name, role, company, category band at the bottom (Participant, Intervenant…).
+- **Visiteur**: a big "VISITEUR" band, name, who they visit, date and time, badge number, a mention ("À rendre en partant").
+- **Hello**: "HELLO / my name is", the first name as big as it fits, or a dotted line to write it by hand when left empty.
+- Optional **photo** (shrunk in the browser, stays in localStorage, dithered at the size it is drawn so it stays 1-bit) and optional **QR code** (vCard of the person, a link, or text; it needs at least 3 dots per module, so a long vCard can be refused: lighten it).
+- The preview shows the badge **flat** and upright with the 4 mm unprintable bands along the long edges; switch *Aperçu à plat* off to see the ticket as it prints. The PNG and the print always use the printed (turned) orientation.
 
 ### Spécimen de fonts
 

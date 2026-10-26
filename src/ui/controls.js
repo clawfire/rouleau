@@ -1,7 +1,7 @@
 /**
  * Schema → Web Awesome form controls.
  *
- * Supported types: text, textarea, slider, switch, checkboxes, radio, select, callout.
+ * Supported types: text, textarea, slider, switch, checkboxes, radio, select, image, button, callout.
  * Every control writes into `values[key]` and calls `onChange(values)`.
  * Controls flagged `refresh: true` also call `onRefresh(values)` when committed,
  * so a module can rebuild its controls (e.g. load routines once an API key is set).
@@ -17,6 +17,21 @@ const el = (tag, attrs = {}, children = []) => {
   node.append(...children);
   return node;
 };
+
+/** File → shrunk JPEG data URL (small enough for localStorage). */
+async function readImage(file, maxSize) {
+  const bitmap = await createImageBitmap(file);
+  const k = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
+  const canvas = document.createElement('canvas');
+  canvas.width = Math.max(1, Math.round(bitmap.width * k));
+  canvas.height = Math.max(1, Math.round(bitmap.height * k));
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+  bitmap.close?.();
+  return canvas.toDataURL('image/jpeg', 0.85);
+}
 
 /**
  * @param {HTMLElement} container
@@ -125,6 +140,26 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
           emit();
         });
         refreshOn(node, c, 'change');
+        break;
+      }
+      case 'image': {
+        // Picks an image, shrinks it and stores it in `values[key]` as a JPEG data URL (empty string = none).
+        node = el('wa-file-input', { label: c.label, hint: c.hint, accept: 'image/*' });
+        node.addEventListener('change', async () => {
+          const file = node.files?.[0];
+          values[c.key] = file ? await readImage(file, c.maxSize ?? 480) : '';
+          emit();
+          if (c.refresh && onRefresh) onRefresh(values);
+        });
+        break;
+      }
+      case 'button': {
+        node = el('wa-button', { size: 's', appearance: 'outlined', variant: c.variant ?? 'neutral' }, [c.label]);
+        node.addEventListener('click', () => {
+          c.onClick?.(values);
+          emit();
+          if (c.refresh && onRefresh) onRefresh(values);
+        });
         break;
       }
       case 'callout': {

@@ -22,11 +22,12 @@ import '@awesome.me/webawesome-pro/dist/components/checkbox-group/checkbox-group
 import '@awesome.me/webawesome-pro/dist/components/radio-group/radio-group.js';
 import '@awesome.me/webawesome-pro/dist/components/radio/radio.js';
 import '@awesome.me/webawesome-pro/dist/components/select/select.js';
+import '@awesome.me/webawesome-pro/dist/components/file-input/file-input.js';
 import '@awesome.me/webawesome-pro/dist/components/option/option.js';
 import './fonts.js';
 import './styles.css';
 
-import { MAX_PAGE_MM, PAPERS, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
+import { MAX_PAGE_MM, PAPERS, PRINT_WIDTH, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
 import { paginate } from './engine/paginate.js';
 import { renderTicket } from './engine/render.js';
 import { MODULES, moduleById } from './modules/index.js';
@@ -170,7 +171,7 @@ async function render() {
     const bitmap = await renderTicket(blocks);
     if (id !== state.renderId) return; // a newer render started meanwhile
     state.bitmap = bitmap;
-    bitmap.toCanvas($('#ticket'));
+    showPreview(bitmap, state.module.turn?.(state.values));
     updateMeta(bitmap);
   } catch (err) {
     console.error(err);
@@ -178,6 +179,34 @@ async function render() {
   } finally {
     if (id === state.renderId) spinner.hidden = true;
   }
+}
+
+/**
+ * Draw the ticket in the preview. A module that prints sideways (badges) can ask for `turn`:
+ * the bitmap printed turned 90° clockwise ('cw') or counter-clockwise ('ccw') is shown upright and flat.
+ * The bitmap itself, used for printing and the PNG, is never touched.
+ */
+function showPreview(bitmap, turn) {
+  const canvas = $('#ticket');
+  const paper = $('#paper');
+  bitmap.toCanvas(canvas);
+  if (turn === 'cw' || turn === 'ccw') {
+    const printed = document.createElement('canvas');
+    printed.width = canvas.width;
+    printed.height = canvas.height;
+    printed.getContext('2d').drawImage(canvas, 0, 0);
+    const { width: w, height: h } = printed;
+    canvas.width = h;
+    canvas.height = w;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    // Inverse of the rotation used to print: cw → (x, y) ↦ (y, w - x); ccw → (x, y) ↦ (h - y, x).
+    if (turn === 'cw') ctx.setTransform(0, -1, 1, 0, 0, w);
+    else ctx.setTransform(0, 1, -1, 0, h, 0);
+    ctx.drawImage(printed, 0, 0);
+  }
+  paper.dataset.flat = turn ? 'true' : 'false';
+  paper.style.setProperty('--flat-ratio', String(canvas.width / PRINT_WIDTH));
 }
 
 const scheduleRender = debounce(render, 120);
