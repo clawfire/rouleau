@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="fr" class="wa-theme-default wa-palette-default wa-light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rouleau</title>
+    <meta name="description" content="Générateur de tickets pour imprimante thermique Phomemo T02" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect x='7' y='2' width='18' height='26' rx='2' fill='%23111'/><path d='M7 26l3 3 3-3 3 3 3-3 3 3 3-3' stroke='%23111' stroke-width='2' fill='none'/><rect x='10' y='7' width='12' height='2' fill='%23fff'/><rect x='10' y='12' width='9' height='2' fill='%23fff'/><rect x='10' y='17' width='12' height='2' fill='%23fff'/></svg>" />
+    <script type="module" src="/src/main.js"></script>
+  </head>
+  <body>
+    <wa-page mobile-breakpoint="900">
+      <header slot="header" class="wa-split">
+        <div class="wa-cluster wa-gap-xs wa-align-items-center">
+          <wa-icon name="receipt" class="brand-icon"></wa-icon>
+          <strong class="brand-name">Rouleau</strong>
+          <wa-tag size="s" appearance="outlined" variant="neutral">T02 · 48 mm</wa-tag>
+        </div>
+        <div class="wa-cluster wa-gap-xs">
+          <wa-button id="btn-png" appearance="outlined" size="s">
+            <wa-icon slot="start" name="download"></wa-icon>
+            PNG
+          </wa-button>
+          <wa-button id="btn-system" appearance="outlined" size="s">
+            <wa-icon slot="start" name="print"></wa-icon>
+            ⌘P
+          </wa-button>
+          <wa-button id="btn-ble" variant="brand" size="s">
+            <wa-icon slot="start" name="bluetooth-b" family="brands"></wa-icon>
+            Imprimer
+          </wa-button>
+        </div>
+      </header>
+
+      <nav slot="subheader" class="wa-cluster wa-gap-xs wa-mobile-only">
+        <wa-button data-toggle-nav appearance="plain" size="s">
+          <wa-icon name="bars" label="Modules"></wa-icon>
+        </wa-button>
+        <span class="wa-caption-m" id="current-module-mobile"></span>
+      </nav>
+
+      <nav slot="navigation-header" class="wa-caption-m nav-title">Modules</nav>
+      <nav slot="navigation" id="module-nav" class="wa-stack wa-gap-3xs"></nav>
+
+      <main class="wa-flank wa-align-items-start wa-gap-2xl workspace">
+        <section class="wa-stack wa-gap-l controls-col" aria-labelledby="module-title">
+          <div class="wa-stack wa-gap-2xs">
+            <h1 id="module-title" class="wa-heading-l"></h1>
+            <p id="module-description" class="wa-body-s wa-color-text-quiet"></p>
+          </div>
+
+          <wa-card>
+            <div slot="header" class="wa-cluster wa-gap-xs">
+              <wa-icon name="sliders"></wa-icon>
+              <strong>Réglages</strong>
+            </div>
+            <div id="module-controls" class="wa-stack wa-gap-l"></div>
+          </wa-card>
+
+          <wa-card>
+            <div slot="header" class="wa-cluster wa-gap-xs">
+              <wa-icon name="print"></wa-icon>
+              <strong>Impression</strong>
+            </div>
+            <div id="print-controls" class="wa-stack wa-gap-l"></div>
+            <wa-callout id="ble-callout" variant="neutral" size="s" class="ble-callout">
+              <wa-icon slot="icon" name="circle-info"></wa-icon>
+              <span id="ble-status">
+                Bluetooth direct depuis Chrome ou Edge. Si le bridge macOS garde la T02 connectée, le navigateur ne la verra pas : utilise alors ⌘P.
+              </span>
+            </wa-callout>
+          </wa-card>
+        </section>
+
+        <section class="wa-stack wa-gap-m preview-col" aria-label="Aperçu du ticket">
+          <div class="wa-split wa-gap-s">
+            <wa-radio-group id="zoom" value="fit" orientation="horizontal" size="s" label="Zoom" class="zoom">
+              <wa-radio value="fit" appearance="button">Ajusté</wa-radio>
+              <wa-radio value="1" appearance="button">1×</wa-radio>
+              <wa-radio value="mm" appearance="button">Taille réelle</wa-radio>
+            </wa-radio-group>
+            <div class="wa-cluster wa-gap-xs" id="ticket-meta"></div>
+          </div>
+          <div class="paper-wrap">
+            <div class="paper-shadow">
+              <div class="paper" id="paper" data-zoom="fit">
+                <canvas id="ticket" aria-label="Aperçu du ticket" role="img"></canvas>
+              </div>
+            </div>
+            <wa-spinner id="rendering" class="rendering" hidden></wa-spinner>
+          </div>
+        </section>
+      </main>
+    </wa-page>
+  </body>
+</html>

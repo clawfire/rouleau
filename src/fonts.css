@@ -1,0 +1,8 @@
+/* Departure Mono by Helena Zhang, SIL OFL 1.1 (see src/assets/fonts/departure-mono/LICENSE) */
+@font-face {
+  font-family: 'Departure Mono';
+  src: url('./assets/fonts/departure-mono/DepartureMono-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

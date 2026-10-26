@@ -1,0 +1,158 @@
+/*
+ * Rouleau — app styles on top of Web Awesome.
+ * Only two literal colours on purpose: the thermal paper and its ink.
+ * Physical sizes (px of the 384-dot head, mm of paper) are literal by nature.
+ */
+
+:root {
+  --paper: oklch(98.5% 0.008 95);
+  --paper-shadow: oklch(20% 0.02 260 / 0.18);
+  --tooth: 10px; /* torn-edge zigzag */
+}
+
+.wa-dark {
+  --paper: oklch(95% 0.012 95);
+  --paper-shadow: oklch(0% 0 0 / 0.5);
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+wa-page {
+  --menu-width: 17rem;
+}
+
+wa-page[view='mobile'] {
+  --menu-width: auto;
+}
+
+/* ---------- Header ---------- */
+
+.brand-icon {
+  font-size: var(--wa-font-size-l);
+}
+
+.brand-name {
+  font-family: 'Archivo Black', var(--wa-font-family-heading);
+  font-size: var(--wa-font-size-l);
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Navigation ---------- */
+
+.nav-title {
+  padding-block-end: var(--wa-space-2xs);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-xs);
+  padding: var(--wa-space-xs) var(--wa-space-s);
+  border-radius: var(--wa-border-radius-m);
+  color: var(--wa-color-text-normal);
+  text-decoration: none;
+}
+
+.nav-item wa-icon {
+  inline-size: 1.25em;
+  color: var(--wa-color-text-quiet);
+}
+
+.nav-item wa-badge {
+  margin-inline-start: auto;
+}
+
+a.nav-item:hover {
+  background: var(--wa-color-neutral-fill-quiet);
+}
+
+a.nav-item[aria-current='page'] {
+  background: var(--wa-color-brand-fill-quiet);
+  color: var(--wa-color-brand-on-quiet);
+  font-weight: var(--wa-font-weight-semibold);
+}
+
+a.nav-item[aria-current='page'] wa-icon {
+  color: inherit;
+}
+
+.nav-item[aria-disabled='true'] {
+  color: var(--wa-color-text-quiet);
+  cursor: default;
+}
+
+/* ---------- Workspace ---------- */
+
+.workspace {
+  --flank-size: 24rem;
+  --content-percentage: 40%;
+}
+
+.controls-col h1,
+.controls-col p {
+  margin: 0;
+}
+
+.ble-callout {
+  margin-block-start: var(--wa-space-l);
+}
+
+/* ---------- Ticket preview ---------- */
+
+.paper-wrap {
+  container-type: inline-size;
+  position: relative;
+  overflow-x: auto;
+  padding-block: var(--wa-space-m) var(--wa-space-3xl);
+  padding-inline: var(--wa-space-xs);
+}
+
+.paper {
+  inline-size: fit-content;
+  margin-inline: auto;
+  background: var(--paper);
+  padding-block: var(--tooth);
+  /* Torn top and bottom edges */
+  mask:
+    conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--tooth) 51% repeat-x,
+    conic-gradient(from 135deg at top, #0000, #000 1deg 89deg, #0000 90deg) top / var(--tooth) 51% repeat-x;
+}
+
+.paper-shadow {
+  filter: drop-shadow(0 var(--wa-space-2xs) var(--wa-space-s) var(--paper-shadow));
+}
+
+#ticket {
+  display: block;
+  image-rendering: pixelated;
+  mix-blend-mode: multiply; /* white pixels take the paper colour */
+  inline-size: 384px;
+}
+
+.paper[data-zoom='fit'] #ticket {
+  inline-size: min(768px, calc(100cqi - var(--wa-space-xl)));
+}
+
+.paper[data-zoom='mm'] #ticket {
+  inline-size: 48mm;
+}
+
+.rendering {
+  position: absolute;
+  inset-block-start: var(--wa-space-m);
+  inset-inline-end: var(--wa-space-m);
+  font-size: var(--wa-font-size-xl);
+}
+
+.zoom::part(form-control-label) {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
