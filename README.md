@@ -51,6 +51,7 @@ src/
 │   ├── specimen.js    # font specimen ticket
 │   ├── morning.js     # weather + agenda + priorities + quote
 │   ├── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
+│   ├── bujo.js        # bullet journal: habit tracker, week, day, key
 │   ├── badge.js       # sideways badges (+ badge-draw.js)
 │   └── oracle.js      # 8-ball, tarot, dice, fortune cookie (+ oracle-draw.js)
 ├── ui/controls.js     # control schema → Web Awesome form components
@@ -140,6 +141,16 @@ A ticket that answers a question, with the answer *drawn* (all in Canvas 2D, bla
 - **Fortune cookie**: a broken cookie holding the paper slip with the fortune and six lucky numbers.
 
 The draw is seeded: the preview and the print show the same answer until you press *Tirer à nouveau*. Drawings live in `src/modules/oracle-draw.js`.
+
+### Bullet journal
+
+Stickers for a bullet journal, drawn on **the grid of your notebook** (*Pas de la grille*: 5 mm = the dot grid of a Leuchtturm1917, i.e. 40 dots; for a ruled notebook, measure ten line gaps and divide by ten). Everything is built in whole cells, so rows and columns land on the dots of the page. The strips run along the tape, with the 48 mm of the head across the page.
+
+- **Suivi d'habitudes**: *month* (one row per day, 28–31) or *week* (Mon → Sun, taller rows with the date of each). Up to 7 habits at 5 mm (fewer on a wider grid), their names written along the top; weekends in black; empty circles, dots or blank cells to fill in.
+- **Semaine**: Mon → Sun with the ISO week number and the dates, **3 ruled lines a day** for tasks and notes (1 to 6), weekend days in black. Optionally fed by your Google Calendar (the iCal addresses typed in the morning ticket are reused): the week's events fill the first lines.
+- **Journée**: big date, three priorities with drawn checkboxes, then ruled lines with a dot where the bullet goes (rapid logging).
+- **Légende**: the key to your bullets (task, event, note, done, migrated, scheduled, priority), with your own words if you want.
+- *Date de référence* picks the month, week or day (empty = today).
 
 ### Spécimen de fonts
 

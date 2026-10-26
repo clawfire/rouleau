@@ -15,6 +15,7 @@
  */
 import specimen from './specimen.js';
 import badge from './badge.js';
+import bujo from './bujo.js';
 import morning from './morning.js';
 import oracle from './oracle.js';
 import qr from './qr.js';
@@ -23,6 +24,7 @@ import workout from './workout.js';
 export const MODULES = [
   workout,
   morning,
+  bujo,
   qr,
   badge,
   oracle,

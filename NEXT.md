@@ -11,6 +11,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
     - *Bilan*: last (or chosen) Hevy workout, totals grid + PRs; formats *Court* (default, ~7 cm) and *Complet*
     - *Vierge*: no Hevy, N exercises × M sets with kg / reps / effort fields
   - **Spécimen de fonts** (`src/modules/specimen.js`)
+  - **Bullet journal** (`src/modules/bujo.js`): habit tracker (month / week), week Mon → Sun with 3 lines a day, daily log, key; grid step adjustable (5 mm = Leuchtturm dot grid)
   - **L'oracle** (`src/modules/oracle.js`): 8-ball, tarot (major arcana), dice, fortune cookie; seeded draw + "Tirer à nouveau" button
   - **Badges** (`src/modules/badge.js` + `badge-draw.js`): conference / visitor / hello, 48 mm tall by 60–160 mm long, printed sideways; optional dithered photo and QR; flat preview via `turn()` in `main.js`
   - **QR utilitaires** (`src/modules/qr.js`, payloads + matrix in `src/services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
@@ -37,6 +38,10 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 - [x] Preview margins (48 mm print + 4 mm paper each side)
 
 ## Still untested
+
+- [ ] Bullet journal stickers on real paper: do the 5 mm rows line up with the dots of a Leuchtturm1917 once stuck (printed cell = 40 dots ≈ 5.005 mm, so ~0.1 mm drift over 20 rows)? And the Pineider Hollywood grid is unknown: ask for its line / dot spacing
+- [ ] Week sticker with real calendar events (reuses the iCal addresses of the morning ticket)
+- [ ] Bullet journal ideas not done: year in pixels / mood strip, collection index labels, dot-grid ruler strip
 
 - [ ] Badges on real tape: which end should come out first (cw / ccw), a 3-dot-module vCard QR, the dithered photo at 230 dots, the black bands at max density
 - [ ] Badge photo from a real camera / phone (EXIF rotation relies on `createImageBitmap`)
