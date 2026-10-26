@@ -4,7 +4,8 @@
  * expanded with ical.js.
  *
  * In dev, calendar.google.com goes through Vite's proxy (`/gcal`, see
- * vite.config.js) because Google sends no CORS headers. In a static build the
+ * vite.config.js) because Google sends no CORS headers; on Netlify a rewrite in
+ * netlify.toml does the same (VITE_USE_PROXY). In a static build the
  * feed is fetched directly, which only works for hosts that allow the origin.
  */
 import ICAL from 'ical.js';
@@ -21,7 +22,7 @@ function resolveUrl(raw) {
   } catch {
     throw new CalendarError('Adresse iCal invalide.');
   }
-  if (import.meta.env.DEV && url.hostname === 'calendar.google.com') return `/gcal${url.pathname}${url.search}`;
+  if ((import.meta.env.DEV || import.meta.env.VITE_USE_PROXY) && url.hostname === 'calendar.google.com') return `/gcal${url.pathname}${url.search}`;
   return url.href;
 }
 

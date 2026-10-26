@@ -2,10 +2,11 @@
  * Minimal Hevy API client (https://api.hevyapp.com/docs, Hevy Pro API key).
  *
  * In dev, calls go through Vite's proxy (`/hevy` → api.hevyapp.com, see
- * vite.config.js) so the browser never hits CORS. In a static build they go
+ * vite.config.js) so the browser never hits CORS; on Netlify (VITE_USE_PROXY) a
+ * rewrite in netlify.toml plays the same role. In any other static build they go
  * straight to the API, which only works if Hevy allows the page's origin.
  */
-const BASE = import.meta.env.DEV ? '/hevy/v1' : 'https://api.hevyapp.com/v1';
+const BASE = import.meta.env.DEV || import.meta.env.VITE_USE_PROXY ? '/hevy/v1' : 'https://api.hevyapp.com/v1';
 const PAGE_SIZE = 10; // API maximum
 
 const cache = new Map();

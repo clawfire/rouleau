@@ -1,0 +1,3 @@
+# Used by Netlify only (see netlify.toml). The token comes from the WEBAWESOME_TOKEN environment variable.
+@awesome.me:registry=https://npm.cloudsmith.io/fortawesome/webawesome-pro/
+//npm.cloudsmith.io/fortawesome/webawesome-pro/:_authToken=${WEBAWESOME_TOKEN}

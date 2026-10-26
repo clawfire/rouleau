@@ -1,0 +1,25 @@
+# Netlify build. Needs one environment variable: WEBAWESOME_TOKEN (Web Awesome Pro token,
+# Site configuration › Environment variables, mark it as secret).
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  # Installs run before the build command, so point npm at a committed config that
+  # reads the token from the environment (the real .npmrc is git-ignored).
+  NPM_CONFIG_USERCONFIG = ".npmrc.netlify"
+  # Use the /hevy and /gcal rewrites below instead of calling the APIs from the browser (CORS).
+  VITE_USE_PROXY = "1"
+
+# Same role as the Vite dev proxy: Hevy and Google Calendar send no CORS headers.
+[[redirects]]
+  from = "/hevy/*"
+  to = "https://api.hevyapp.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/gcal/*"
+  to = "https://calendar.google.com/:splat"
+  status = 200
+  force = true
