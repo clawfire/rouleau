@@ -82,7 +82,22 @@ Then add it to `MODULES` in `src/modules/index.js`. `build` may be `async` (fetc
 
 Control types: `text`, `textarea`, `slider`, `switch`, `checkboxes`, `radio`, `select`.
 
-Block builders: `text` (options include `frame` for outlined bands), `row` (key ……… value), `rule` (`solid` · `dashed` · `dotted` · `zigzag`), `space`, `image` (dithered), `gradient`, `draw` (raw Canvas 2D).
+Block builders: `text` (options include `invert` for black bands, `frame` for outlined ones), `check` (drawn checkbox row, optional write-in line), `lines` (handwriting lines), `row` (key ……… value), `rule` (`solid` · `dashed` · `dotted` · `zigzag`), `space`, `image` (dithered), `gradient`, `draw` (raw Canvas 2D).
+
+## Modules
+
+### Séance de sport (Hevy)
+
+Prints a Hevy routine: one drawn checkbox per set, a write-in line for what you actually lifted, last session's numbers, rest times, and a notes + energy zone.
+
+- Paste your Hevy API key (Hevy Pro › Settings › Developer). It stays in your browser's localStorage.
+- Without a key, the preview uses a demo routine.
+- Run with `npm run dev`: Vite proxies `/hevy` to `api.hevyapp.com`, so the browser never hits CORS. A static build calls the API directly, which only works if Hevy allows the page's origin.
+- Set tags: `É` warm-up, `F` failure, `D` drop set.
+
+### Spécimen de fonts
+
+Every house font at several sizes, plus the dithering comparison.
 
 ## Print notes (tested on paper)
 

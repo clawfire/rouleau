@@ -60,6 +60,32 @@ export const gradient = (o = {}) => ({ type: 'gradient', height: 40, dither: 'at
  */
 export const draw = (height, fn, o = {}) => ({ type: 'draw', height, fn, mode: 'threshold', ...o });
 
+/**
+ * Checkbox row: drawn box + label + value, optional write-in line.
+ *   ☐ 2   41 kg × 10   ________
+ * Boxes are drawn (font glyphs are too small on paper).
+ * @param {string} label  short tag before the value (set number…)
+ * @param {string} value
+ * @param {object} [o] { family, size, weight, box (px), write (bool), checked }
+ */
+export const check = (label, value, o = {}) => ({
+  type: 'check',
+  label: String(label ?? ''),
+  value: String(value ?? ''),
+  family: 'Departure Mono',
+  size: 22,
+  box: 24,
+  write: false,
+  ...o,
+});
+
+/**
+ * Lines to write on by hand.
+ * @param {number} count
+ * @param {{ gap?: number, style?: 'solid'|'dotted', label?: string }} [o] gap = line spacing in dots
+ */
+export const lines = (count = 3, o = {}) => ({ type: 'lines', count, gap: 36, style: 'dotted', ...o });
+
 /* ------------------------------------------------------------------ */
 /* Renderers: block → Bitmap                                           */
 /* ------------------------------------------------------------------ */
@@ -180,6 +206,55 @@ function renderRow(b, W, inset) {
   return toBits(ctx, W, H, 'threshold', { level: b.level });
 }
 
+function renderCheck(b, W, inset) {
+  const probe = makeCanvas(1, 1).ctx;
+  const metrics = setupText(probe, b);
+  const box = b.box;
+  const H = Math.max(box + 8, metrics.lineH);
+  const { ctx } = makeCanvas(W, H);
+  setupText(ctx, b);
+  const y = Math.round((H - metrics.natural) / 2) + metrics.ascent;
+  const x0 = inset;
+  const labelX = x0 + box + 10;
+  const valueX = labelX + Math.max(ctx.measureText('É9').width, ctx.measureText(b.label).width) + 12;
+  ctx.textAlign = 'left';
+  ctx.fillText(b.label, labelX, y);
+  ctx.fillText(b.value, valueX, y);
+  const bmp = toBits(ctx, W, H, 'threshold', { level: b.level });
+  const by = Math.round((H - box) / 2);
+  bmp.strokeRect(x0, by, box, box, 3);
+  if (b.checked) {
+    // Simple drawn tick: two thick strokes.
+    for (let i = 0; i < box * 0.35; i++) for (let t = 0; t < 3; t++) bmp.set(x0 + 5 + i, by + Math.round(box * 0.5) + i + t - 1);
+    for (let i = 0; i < box * 0.6; i++) for (let t = 0; t < 3; t++) bmp.set(x0 + 5 + Math.round(box * 0.35) + i, by + Math.round(box * 0.85) - i + t - 1);
+  }
+  if (b.write) {
+    const from = Math.max(valueX + ctx.measureText(b.value).width + 16, Math.round(W * 0.62));
+    const ly = by + box - 1;
+    for (let x = from; x < W - inset; x++) if ((x - from) % 4 < 2) {
+        bmp.set(x, ly);
+        bmp.set(x, ly + 1);
+      }
+  }
+  return bmp;
+}
+
+function renderLines(b, W, inset) {
+  const gap = b.gap ?? 36;
+  const H = gap * b.count + 4;
+  const bmp = Bitmap.blank(H, W);
+  for (let i = 1; i <= b.count; i++) {
+    const y = i * gap;
+    for (let x = inset; x < W - inset; x++) {
+      if (b.style === 'solid' || (x - inset) % 6 < 2) {
+        bmp.set(x, y);
+        if (b.style === 'solid') bmp.set(x, y + 1);
+      }
+    }
+  }
+  return bmp;
+}
+
 function renderRule(b, W, inset) {
   const t = b.thickness ?? 2;
   const m = b.margin ?? 8;
@@ -246,6 +321,10 @@ export function renderBlock(block, { width = PRINT_WIDTH, inset = 0 } = {}) {
       return renderRow(block, width, inset);
     case 'rule':
       return renderRule(block, width, inset);
+    case 'check':
+      return renderCheck(block, width, inset);
+    case 'lines':
+      return renderLines(block, width, inset);
     case 'space':
       return Bitmap.blank(block.height, width);
     case 'image':

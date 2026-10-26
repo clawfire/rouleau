@@ -122,12 +122,41 @@ function selectModule(id) {
   $('#module-description').textContent = mod.description ?? '';
   $('#current-module-mobile').textContent = mod.label;
   document.title = `${mod.label} · Rouleau`;
-  renderControls($('#module-controls'), mod.controls ?? [], state.values, (values) => {
-    store.set(`module:${mod.id}`, values);
-    scheduleRender();
-  });
   renderNav();
+  renderModuleControls();
   scheduleRender();
+}
+
+/**
+ * Module controls can be a static schema or an async function of the values
+ * (e.g. a routine picker that needs an API key first).
+ */
+async function renderModuleControls() {
+  const mod = state.module;
+  const container = $('#module-controls');
+  let schema = mod.controls ?? [];
+  if (typeof schema === 'function') {
+    container.replaceChildren(Object.assign(document.createElement('wa-spinner'), {}));
+    try {
+      schema = await schema(state.values);
+    } catch (err) {
+      schema = [{ type: 'callout', variant: 'danger', text: err.message ?? String(err) }];
+    }
+    if (state.module !== mod) return; // user switched module meanwhile
+  }
+  renderControls(
+    container,
+    schema,
+    state.values,
+    (values) => {
+      store.set(`module:${mod.id}`, values);
+      scheduleRender();
+    },
+    () => {
+      renderModuleControls();
+      scheduleRender();
+    },
+  );
 }
 
 /* ---------- Rendering ---------- */

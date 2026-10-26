@@ -6,4 +6,14 @@ export default defineConfig({
   build: {
     target: 'es2022',
   },
+  server: {
+    proxy: {
+      // Hevy API without CORS headaches in dev: /hevy/v1/... → https://api.hevyapp.com/v1/...
+      '/hevy': {
+        target: 'https://api.hevyapp.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/hevy/, ''),
+      },
+    },
+  },
 });

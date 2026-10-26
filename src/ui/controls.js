@@ -1,8 +1,10 @@
 /**
  * Schema → Web Awesome form controls.
  *
- * Supported types: text, textarea, slider, switch, checkboxes, radio, select.
+ * Supported types: text, textarea, slider, switch, checkboxes, radio, select, callout.
  * Every control writes into `values[key]` and calls `onChange(values)`.
+ * Controls flagged `refresh: true` also call `onRefresh(values)` when committed,
+ * so a module can rebuild its controls (e.g. load routines once an API key is set).
  */
 
 const el = (tag, attrs = {}, children = []) => {
@@ -21,21 +23,33 @@ const el = (tag, attrs = {}, children = []) => {
  * @param {object[]} schema
  * @param {object} values  mutated in place
  * @param {(values: object) => void} onChange
+ * @param {(values: object) => void} [onRefresh]
  */
-export function renderControls(container, schema, values, onChange) {
+export function renderControls(container, schema, values, onChange, onRefresh) {
   container.replaceChildren();
   const emit = () => onChange(values);
+  const refreshOn = (node, c, event) => {
+    if (c.refresh && onRefresh) node.addEventListener(event, () => onRefresh(values));
+  };
 
   for (const c of schema) {
     let node;
     switch (c.type) {
       case 'text': {
-        node = el('wa-input', { label: c.label, hint: c.hint, placeholder: c.placeholder });
+        node = el('wa-input', {
+          label: c.label,
+          hint: c.hint,
+          placeholder: c.placeholder,
+          type: c.password ? 'password' : 'text',
+          'password-toggle': c.password,
+          autocomplete: c.password ? 'off' : undefined,
+        });
         node.value = values[c.key] ?? '';
         node.addEventListener('input', () => {
           values[c.key] = node.value;
           emit();
         });
+        refreshOn(node, c, 'change');
         break;
       }
       case 'textarea': {
@@ -103,11 +117,20 @@ export function renderControls(container, schema, values, onChange) {
       case 'select': {
         node = el('wa-select', { label: c.label, hint: c.hint });
         for (const opt of c.options) node.append(el('wa-option', { value: opt.value }, [opt.label]));
-        node.value = String(values[c.key]);
+        node.value = String(values[c.key] ?? '');
         node.addEventListener('change', () => {
           values[c.key] = node.value;
           emit();
         });
+        refreshOn(node, c, 'change');
+        break;
+      }
+      case 'callout': {
+        const icon = el('wa-icon', {
+          slot: 'icon',
+          name: { danger: 'triangle-exclamation', warning: 'triangle-exclamation', success: 'circle-check' }[c.variant] ?? 'circle-info',
+        });
+        node = el('wa-callout', { variant: c.variant ?? 'neutral', size: 's' }, [icon, c.text]);
         break;
       }
       default:

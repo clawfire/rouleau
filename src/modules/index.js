@@ -13,12 +13,13 @@
  * Planned modules are listed with `soon: true` so the navigation shows the roadmap.
  */
 import specimen from './specimen.js';
+import workout from './workout.js';
 
 export const MODULES = [
+  workout,
   specimen,
   { id: 'photo', label: 'Labo photo', icon: 'camera-retro', soon: true },
   { id: 'morning', label: 'Ticket du matin', icon: 'mug-hot', soon: true },
-  { id: 'workout', label: 'Séance de sport', icon: 'dumbbell', soon: true },
   { id: 'tasks', label: 'Tickets de tâches', icon: 'list-check', soon: true },
   { id: 'focus', label: 'Ticket de focus', icon: 'bullseye', soon: true },
   { id: 'oracle', label: "L'oracle", icon: 'hat-wizard', soon: true },

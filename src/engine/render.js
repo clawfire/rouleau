@@ -9,7 +9,7 @@ import { PRINT_WIDTH } from './constants.js';
 async function ensureFonts(blocks) {
   if (!document.fonts?.load) return;
   const fonts = new Set(
-    blocks.filter((b) => b.type === 'text' || b.type === 'row').map((b) => fontString(b)),
+    blocks.filter((b) => ['text', 'row', 'check'].includes(b.type)).map((b) => fontString(b)),
   );
   await Promise.all([...fonts].map((f) => document.fonts.load(f, 'AaÉé09€').catch(() => null)));
 }

@@ -21,6 +21,8 @@ export class Bitmap {
   }
 
   set(x, y, v = 1) {
+    x = Math.round(x);
+    y = Math.round(y);
     if (x < 0 || y < 0 || x >= this.width || y >= this.height) return;
     this.data[y * this.width + x] = v ? 1 : 0;
   }
