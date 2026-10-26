@@ -17,6 +17,7 @@ export default {
   id: 'specimen',
   label: 'Spécimen de fonts',
   icon: 'font',
+  group: 'dev', // listed under the collapsed "Développeurs" section of the menu
   description: 'Chaque font à plusieurs tailles et graisses, plus une comparaison des tramages. Un ticket, et tu tranches.',
 
   defaults: {

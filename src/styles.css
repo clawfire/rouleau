@@ -86,6 +86,36 @@ a.nav-item[aria-current='page'] wa-icon {
   cursor: default;
 }
 
+/* Collapsed "Développeurs" group: the summary looks like a nav item, its entries are indented. */
+.nav-group {
+  --spacing: 0;
+  margin-block-start: var(--wa-space-s);
+}
+
+.nav-group::part(summary) {
+  padding: var(--wa-space-xs) var(--wa-space-s);
+  border-radius: var(--wa-border-radius-m);
+  color: var(--wa-color-text-quiet);
+}
+
+.nav-group::part(summary):hover {
+  background: var(--wa-color-neutral-fill-quiet);
+}
+
+.nav-group::part(content) {
+  padding-inline-start: var(--wa-space-m);
+}
+
+.nav-group-title {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-xs);
+}
+
+.nav-group-title wa-icon {
+  inline-size: 1.25em;
+}
+
 /* ---------- Workspace ---------- */
 
 .workspace {

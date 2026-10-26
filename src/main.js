@@ -23,6 +23,7 @@ import '@awesome.me/webawesome-pro/dist/components/radio-group/radio-group.js';
 import '@awesome.me/webawesome-pro/dist/components/radio/radio.js';
 import '@awesome.me/webawesome-pro/dist/components/select/select.js';
 import '@awesome.me/webawesome-pro/dist/components/file-input/file-input.js';
+import '@awesome.me/webawesome-pro/dist/components/details/details.js';
 import '@awesome.me/webawesome-pro/dist/components/option/option.js';
 import './fonts.js';
 import './styles.css';
@@ -89,30 +90,57 @@ const printer = new T02Bluetooth();
 
 /* ---------- Navigation ---------- */
 
+/** Whether the "Développeurs" group is expanded; it opens by itself when one of its modules is selected. */
+let devNavOpen = false;
+
+function navItem(m) {
+  const item = document.createElement(m.soon ? 'span' : 'a');
+  item.className = 'nav-item';
+  const icon = document.createElement('wa-icon');
+  icon.setAttribute('name', m.icon);
+  item.append(icon, m.label);
+  if (m.soon) {
+    item.setAttribute('aria-disabled', 'true');
+    const badge = document.createElement('wa-badge');
+    badge.setAttribute('variant', 'neutral');
+    badge.setAttribute('appearance', 'outlined');
+    badge.textContent = 'bientôt';
+    item.append(badge);
+  } else {
+    item.href = `#${m.id}`;
+    item.dataset.drawer = 'close';
+    if (state.module?.id === m.id) item.setAttribute('aria-current', 'page');
+  }
+  return item;
+}
+
+/** Modules flagged `group: 'dev'` (tools for tuning Rouleau itself) live in a collapsed section. */
 function renderNav() {
   const nav = $('#module-nav');
-  nav.replaceChildren(
-    ...MODULES.map((m) => {
-      const item = document.createElement(m.soon ? 'span' : 'a');
-      item.className = 'nav-item';
-      const icon = document.createElement('wa-icon');
-      icon.setAttribute('name', m.icon);
-      item.append(icon, m.label);
-      if (m.soon) {
-        item.setAttribute('aria-disabled', 'true');
-        const badge = document.createElement('wa-badge');
-        badge.setAttribute('variant', 'neutral');
-        badge.setAttribute('appearance', 'outlined');
-        badge.textContent = 'bientôt';
-        item.append(badge);
-      } else {
-        item.href = `#${m.id}`;
-        item.dataset.drawer = 'close';
-        if (state.module?.id === m.id) item.setAttribute('aria-current', 'page');
-      }
-      return item;
-    }),
-  );
+  const dev = MODULES.filter((m) => m.group === 'dev');
+  const items = MODULES.filter((m) => m.group !== 'dev').map(navItem);
+  if (dev.length) {
+    if (dev.some((m) => m.id === state.module?.id)) devNavOpen = true;
+    const group = document.createElement('wa-details');
+    group.className = 'nav-group';
+    group.setAttribute('appearance', 'plain');
+    group.setAttribute('icon-placement', 'end');
+    group.toggleAttribute('open', devNavOpen);
+    const summary = document.createElement('span');
+    summary.slot = 'summary';
+    summary.className = 'nav-group-title';
+    const icon = document.createElement('wa-icon');
+    icon.setAttribute('name', 'code');
+    summary.append(icon, 'Développeurs');
+    const list = document.createElement('div');
+    list.className = 'wa-stack wa-gap-3xs';
+    list.append(...dev.map(navItem));
+    group.append(summary, list);
+    group.addEventListener('wa-show', () => (devNavOpen = true));
+    group.addEventListener('wa-hide', () => (devNavOpen = false));
+    items.push(group);
+  }
+  nav.replaceChildren(...items);
 }
 
 function selectModule(id) {

@@ -82,7 +82,7 @@ export default {
 };
 ```
 
-Then add it to `MODULES` in `src/modules/index.js`. `build` may be `async` (fetch an API, load an image…).
+Then add it to `MODULES` in `src/modules/index.js`. Add `group: 'dev'` to a module meant for tuning Rouleau itself (like the font specimen): it goes into the collapsed *Développeurs* section of the menu. `build` may be `async` (fetch an API, load an image…).
 
 Control types: `text`, `textarea`, `slider`, `switch`, `checkboxes`, `radio`, `select`, `image` (shrunk JPEG data URL), `button`, `callout`. A module can export `turn(values)` (`'cw'` | `'ccw'`) when it prints sideways: the preview then shows the ticket upright and flat.
 

@@ -4,6 +4,7 @@
  * A module is a plain object:
  *   {
  *     id, label, icon,            // icon = Font Awesome Free name
+ *     group?: 'dev',              // tools for tuning Rouleau itself: collapsed "Développeurs" section of the menu
  *     description,
  *     defaults: { ...values },
  *     controls: [ ...schema ],    // rendered with Web Awesome, see src/ui/controls.js
