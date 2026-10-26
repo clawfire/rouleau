@@ -4,3 +4,9 @@ dist/
 *.log
 .vite/
 .npmrc
+
+# Local agent tooling
+.agents/
+.claude/
+.hermes/
+skills-lock.json
