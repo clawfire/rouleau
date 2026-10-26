@@ -16,7 +16,7 @@
           <strong class="brand-name">Rouleau</strong>
           <wa-tag size="s" appearance="outlined" variant="neutral">T02 · 48 mm</wa-tag>
         </div>
-        <div class="wa-cluster wa-gap-xs">
+        <div class="wa-cluster wa-gap-xs" id="print-actions">
           <wa-button id="btn-png" appearance="outlined" size="s">
             <wa-icon slot="start" name="download"></wa-icon>
             PNG
@@ -41,6 +41,15 @@
 
       <nav slot="navigation-header" class="wa-caption-m nav-title">Modules</nav>
       <nav slot="navigation" id="module-nav" class="wa-stack wa-gap-3xs"></nav>
+      <div slot="navigation-footer" class="credit">
+        <span>Fait par <a href="https://thibaultmilan.com" target="_blank" rel="noopener noreferrer">Thibault Milan</a></span>
+        <a class="credit-repo" href="https://github.com/clawfire/rouleau" target="_blank" rel="noopener noreferrer">
+          <wa-icon name="github" family="brands"></wa-icon>
+          Code source
+        </a>
+      </div>
+
+      <main id="page-main" class="page-main" aria-labelledby="about-title" hidden></main>
 
       <main class="wa-flank wa-align-items-start wa-gap-2xl workspace">
         <section class="wa-stack wa-gap-l controls-col" aria-labelledby="module-title">

@@ -2,7 +2,7 @@
 
 A small web app that generates things to print on a **Phomemo T02** thermal printer (48 mm paper, 384 dots, 203 dpi): font specimens today; morning tickets, workout sheets, task tickets, puzzles and more tomorrow.
 
-Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, no backend (the Brutalist theme fonts and the icons load from CDNs).
+Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, no backend of its own (the Brutalist theme fonts and the icons load from CDNs; Hevy and calendar calls go through a Netlify rewrite).
 
 ## Quick start
 
@@ -190,6 +190,10 @@ npm install
 
 The lockfile points the `@awesome.me` scope at the Pro registry on Cloudsmith; tarballs are served from `dl.fontawesome.com`.
 
+## Suggest a module
+
+Have an idea for a ticket, a badge, a sticker? Open a [module suggestion](https://github.com/clawfire/rouleau/issues/new?template=module-suggestion.yml) (a GitHub account is needed; the suggestion is public). The in-app page *Et plus encore* explains the project, links the macOS driver ([phomemo-t02-macos](https://github.com/clawfire/phomemo-t02-macos), written with Claude's help) and lists what leaves the browser.
+
 ## Working with AI agents
 
 Web Awesome ships two [Agent Skills](https://webawesome.com/docs/ai/agent-skills) in `node_modules`. Install them for Claude Code with:
@@ -199,6 +203,10 @@ npm run skills
 ```
 
 See `AGENTS.md` for project conventions.
+
+## Credits
+
+Made by [Thibault Milan](https://thibaultmilan.com).
 
 ## License
 

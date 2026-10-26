@@ -8,6 +8,7 @@
  */
 const BASE = import.meta.env.DEV || import.meta.env.VITE_USE_PROXY ? '/hevy/v1' : 'https://api.hevyapp.com/v1';
 const PAGE_SIZE = 10; // API maximum
+const CONCURRENCY = 4; // pages fetched at once: much faster than one by one, gentle on the rate limit
 
 const cache = new Map();
 
@@ -52,11 +53,12 @@ export async function listRoutines(apiKey) {
  * @param {number} pages  how many pages of 10 to scan
  */
 export async function recentWorkouts(apiKey, pages = 3) {
-  const out = [];
-  for (let page = 1; page <= pages; page++) {
-    const res = await get(apiKey, '/workouts', { page, pageSize: PAGE_SIZE });
-    out.push(...(res.workouts ?? []));
-    if (page >= (res.page_count ?? 1)) break;
+  const first = await get(apiKey, '/workouts', { page: 1, pageSize: PAGE_SIZE });
+  const out = [...(first.workouts ?? [])];
+  const rest = Array.from({ length: Math.max(0, Math.min(pages, first.page_count ?? 1) - 1) }, (_, i) => i + 2);
+  for (let i = 0; i < rest.length; i += CONCURRENCY) {
+    const batch = await Promise.all(rest.slice(i, i + CONCURRENCY).map((page) => get(apiKey, '/workouts', { page, pageSize: PAGE_SIZE })));
+    for (const res of batch) out.push(...(res.workouts ?? []));
   }
   return out.sort((a, b) => new Date(b.start_time) - new Date(a.start_time));
 }

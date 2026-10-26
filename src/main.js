@@ -31,9 +31,10 @@ import './styles.css';
 import { MAX_PAGE_MM, PAPERS, PRINT_WIDTH, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
 import { paginate } from './engine/paginate.js';
 import { renderTicket } from './engine/render.js';
-import { MODULES, moduleById } from './modules/index.js';
+import { MODULES, PAGES, moduleById } from './modules/index.js';
 import { T02Bluetooth, isBluetoothAvailable } from './print/bluetooth.js';
 import { downloadPNG, systemPrint } from './print/system.js';
+import { renderAbout } from './ui/about.js';
 import { renderControls } from './ui/controls.js';
 
 /* ---------- Small helpers ---------- */
@@ -109,7 +110,7 @@ function navItem(m) {
   } else {
     item.href = `#${m.id}`;
     item.dataset.drawer = 'close';
-    if (state.module?.id === m.id) item.setAttribute('aria-current', 'page');
+    if ((state.page ?? state.module?.id) === m.id) item.setAttribute('aria-current', 'page');
   }
   return item;
 }
@@ -118,7 +119,8 @@ function navItem(m) {
 function renderNav() {
   const nav = $('#module-nav');
   const dev = MODULES.filter((m) => m.group === 'dev');
-  const items = MODULES.filter((m) => m.group !== 'dev').map(navItem);
+  const items = [...MODULES.filter((m) => m.group !== 'dev'), ...PAGES].map(navItem);
+  items.splice(MODULES.filter((m) => m.group !== 'dev').length, 0, Object.assign(document.createElement('hr'), { className: 'nav-sep' }));
   if (dev.length) {
     if (dev.some((m) => m.id === state.module?.id)) devNavOpen = true;
     const group = document.createElement('wa-details');
@@ -143,7 +145,25 @@ function renderNav() {
   nav.replaceChildren(...items);
 }
 
+/** Show a page of the menu that is not a module: no controls, no preview, no print buttons. */
+function showPage(page) {
+  state.page = page.id;
+  $('#page-main').hidden = false;
+  $('.workspace').hidden = true;
+  $('#print-actions').hidden = true;
+  renderAbout($('#page-main'));
+  $('#current-module-mobile').textContent = page.label;
+  document.title = `${page.label} · Rouleau`;
+  renderNav();
+}
+
 function selectModule(id) {
+  const page = PAGES.find((p) => p.id === id);
+  if (page) return showPage(page);
+  state.page = null;
+  $('#page-main').hidden = true;
+  $('.workspace').hidden = false;
+  $('#print-actions').hidden = false;
   const mod = moduleById(id);
   state.module = mod;
   state.values = store.get(`module:${mod.id}`, mod.defaults);

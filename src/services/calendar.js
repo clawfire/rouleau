@@ -26,11 +26,13 @@ function resolveUrl(raw) {
   return url.href;
 }
 
-const feeds = new Map();
+const FEED_TTL = 5 * 60e3; // a feed is downloaded once per 5 minutes, not once per keystroke
+const feeds = new Map(); // url → { at, promise }
 
 async function fetchFeed(raw) {
   const url = resolveUrl(raw);
-  if (feeds.has(url)) return feeds.get(url);
+  const hit = feeds.get(url);
+  if (hit && Date.now() - hit.at < FEED_TTL) return hit.promise;
   const promise = (async () => {
     let res;
     try {
@@ -41,7 +43,7 @@ async function fetchFeed(raw) {
     if (!res.ok) throw new CalendarError(`L'agenda a répondu ${res.status}. Vérifie l'adresse secrète.`);
     return res.text();
   })();
-  feeds.set(url, promise);
+  feeds.set(url, { at: Date.now(), promise });
   promise.catch(() => feeds.delete(url));
   return promise;
 }

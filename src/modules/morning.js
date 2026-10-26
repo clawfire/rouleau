@@ -5,7 +5,7 @@
  */
 import { row, rule, space, text } from '../engine/blocks.js';
 import { TYPE } from '../fonts.js';
-import { CalendarError, agenda, clearCalendarCache } from '../services/calendar.js';
+import { CalendarError, agenda } from '../services/calendar.js';
 import { WeatherError, browserPosition, describe, forecast, geocode } from '../services/weather.js';
 import { fontsReady, item, timeColumn, weatherHeadline } from './morning-draw.js';
 import { quoteOfTheDay } from './quotes.js';
@@ -145,7 +145,6 @@ async function agendaSection(v, now) {
   let events;
   let errors = [];
   if (urls.length) {
-    clearCalendarCache();
     ({ events, errors } = await agenda(urls, now, days));
   } else {
     events = demoEvents();

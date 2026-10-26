@@ -36,4 +36,7 @@ export const MODULES = [
   { id: 'games', label: 'Jeux', icon: 'puzzle-piece', soon: true },
 ];
 
+/** Pages of the menu that are not modules (nothing to print, no controls, no preview). */
+export const PAGES = [{ id: 'about', label: 'Et plus encore', icon: 'heart' }];
+
 export const moduleById = (id) => MODULES.find((m) => m.id === id && !m.soon) ?? MODULES[0];

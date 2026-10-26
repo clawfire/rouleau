@@ -116,6 +116,75 @@ a.nav-item[aria-current='page'] wa-icon {
   inline-size: 1.25em;
 }
 
+.nav-sep {
+  inline-size: 100%;
+  margin-block: var(--wa-space-xs);
+  border: 0;
+  border-block-start: var(--wa-border-width-s) var(--wa-border-style) var(--wa-color-surface-border);
+}
+
+/* "Fait par": always at the foot of the menu. */
+.credit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--wa-space-2xs);
+  padding: var(--wa-space-s) var(--wa-space-s) var(--wa-space-xs);
+  font-size: var(--wa-font-size-s);
+  color: var(--wa-color-text-quiet);
+}
+
+.credit-repo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wa-space-2xs);
+}
+
+.credit a,
+.about a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+/* ---------- "Et plus encore" ---------- */
+
+.page-main {
+  max-inline-size: 42rem;
+  margin-inline: auto;
+}
+
+/* the layout classes set `display`, which would beat the `hidden` attribute */
+.page-main[hidden],
+.workspace[hidden],
+#print-actions[hidden] {
+  display: none;
+}
+
+.about h1,
+.about h2,
+.about p {
+  margin: 0;
+}
+
+.about h1 {
+  font-size: var(--wa-font-size-2xl);
+}
+
+.about h2 {
+  font-size: var(--wa-font-size-l);
+}
+
+.about-list {
+  padding-inline-start: var(--wa-space-l);
+  margin: 0;
+}
+
+.about-credit {
+  color: var(--wa-color-text-quiet);
+  font-size: var(--wa-font-size-s);
+}
+
 /* ---------- Workspace ---------- */
 
 .workspace {

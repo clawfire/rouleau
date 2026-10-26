@@ -32,8 +32,12 @@ const loadImage = (src) =>
     img.src = src;
   });
 
+let photoCache = { key: '', canvas: null }; // the last dithered photo: typing a name must not redo it
+
 /** Square crop of the photo, dithered at the size it will be drawn (1 dot = 1 pixel, so it stays 1-bit). */
 async function ditheredPhoto(src, side, v) {
+  const key = [src.length, src.slice(-48), side, v.photoDither, v.photoBrightness, v.photoContrast].join('|');
+  if (photoCache.key === key) return photoCache.canvas;
   const img = await loadImage(src);
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = side;
@@ -54,6 +58,7 @@ async function ditheredPhoto(src, side, v) {
     out.data.set([c, c, c, 255], i * 4);
   }
   ctx.putImageData(out, 0, 0);
+  photoCache = { key, canvas };
   return canvas;
 }
 

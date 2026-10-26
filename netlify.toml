@@ -23,3 +23,19 @@
   to = "https://calendar.google.com/:splat"
   status = 200
   force = true
+
+# Security headers. A Content-Security-Policy is still to do (see NEXT.md): it has to list the
+# third parties the page talks to (theme fonts, icons, Open-Meteo) and the form captcha.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(self), bluetooth=(self), camera=(), microphone=(), payment=(), usb=(), serial=()"
+
+# Vite fingerprints everything in /assets: cache it for good.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

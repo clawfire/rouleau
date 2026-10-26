@@ -18,8 +18,11 @@ const el = (tag, attrs = {}, children = []) => {
   return node;
 };
 
+const MAX_IMAGE_BYTES = 25 * 1024 * 1024;
+
 /** File → shrunk JPEG data URL (small enough for localStorage). */
 async function readImage(file, maxSize) {
+  if (file.size > MAX_IMAGE_BYTES) throw new Error('too large');
   const bitmap = await createImageBitmap(file);
   const k = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
   const canvas = document.createElement('canvas');
@@ -147,7 +150,14 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
         node = el('wa-file-input', { label: c.label, hint: c.hint, accept: 'image/*' });
         node.addEventListener('change', async () => {
           const file = node.files?.[0];
-          values[c.key] = file ? await readImage(file, c.maxSize ?? 480) : '';
+          try {
+            values[c.key] = file ? await readImage(file, c.maxSize ?? 480) : '';
+            node.setCustomValidity?.('');
+          } catch {
+            values[c.key] = '';
+            node.setCustomValidity?.('Image illisible ou trop lourde (25 Mo maximum).');
+            node.reportValidity?.();
+          }
           emit();
           if (c.refresh && onRefresh) onRefresh(values);
         });

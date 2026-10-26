@@ -1,0 +1,50 @@
+name: Suggérer un module
+description: Une idée de ticket, de badge, d'autocollant… à imprimer sur la T02
+title: "[Module] "
+labels: ["module"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci ! Rouleau est un jouet pour une petite imprimante thermique (48 mm de large, noir et blanc).
+        Les idées les plus faciles à réaliser tiennent sur une bande, sans logiciel externe. Tu peux écrire en français ou en anglais.
+        **Cette issue est publique.**
+  - type: input
+    id: name
+    attributes:
+      label: Nom du module
+      placeholder: Étiquettes de congélateur
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: Qu'est-ce que ça imprime ?
+      description: Ce qu'on voit sur le papier, les champs qu'on remplirait, ce qui change d'une impression à l'autre.
+    validations:
+      required: true
+  - type: textarea
+    id: when
+    attributes:
+      label: Quand tu t'en servirais ?
+      description: Un exemple concret vaut mieux qu'une généralité.
+  - type: dropdown
+    id: format
+    attributes:
+      label: Format
+      options:
+        - Ticket vertical (comme un reçu)
+        - Bande couchée ou autocollant (comme les badges)
+        - Je ne sais pas
+  - type: textarea
+    id: inspiration
+    attributes:
+      label: Une référence ?
+      description: Liens, photos, captures d'écran d'un objet ou d'une appli qui fait déjà ça.
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Visibilité
+      options:
+        - label: Je sais que cette suggestion sera publique sur GitHub.
+          required: true
