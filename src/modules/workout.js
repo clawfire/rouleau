@@ -146,7 +146,7 @@ export default {
     writeIn: true,
     showRest: true,
     notes: true,
-    showSets: true,
+    recapLength: 'short',
     showRpe: true,
     historyPages: 10,
   },
@@ -221,9 +221,18 @@ export default {
           max: 30,
           step: 1,
         },
-        { type: 'switch', key: 'showSets', label: 'Détail des séries' },
-        { type: 'switch', key: 'showRpe', label: 'RPE' },
+        {
+          type: 'radio',
+          key: 'recapLength',
+          label: 'Format',
+          refresh: true,
+          options: [
+            { value: 'short', label: 'Court' },
+            { value: 'full', label: 'Complet' },
+          ],
+        },
       );
+      if (v.recapLength === 'full') schema.push({ type: 'switch', key: 'showRpe', label: 'RPE' });
     } else {
       schema.push(
         { type: 'switch', key: 'showLast', label: 'Afficher la dernière fois' },
@@ -360,12 +369,26 @@ async function buildRecap(v) {
 
   const prs = records.filter((r) => !r.first);
   const firsts = records.filter((r) => r.first);
-  if (prs.length || firsts.length) {
+  const short = v.recapLength !== 'full';
+  const byExercise = new Map();
+  for (const r of prs) byExercise.set(r.exercise, [...(byExercise.get(r.exercise) ?? []), r]);
+  const starTitle = (exercise) => text(`★ ${exercise}`, { ...TYPE.strong, family: 'Archivo Black', weight: 400 });
+
+  if (short) {
+    // One title + one line per exercise: "Poids 92,6 · 1RM 129,6 · Vol. 1 111"
+    const SHORT = { 'Poids max': 'Poids', '1RM estimé': '1RM', 'Volume série': 'Vol.', 'Reps max': 'Reps' };
     blocks.push(space(6), text(prs.length ? `Records · ${prs.length}` : 'Records', TYPE.section), space(6));
-    const byExercise = new Map();
-    for (const r of prs) byExercise.set(r.exercise, [...(byExercise.get(r.exercise) ?? []), r]);
+    if (!byExercise.size) blocks.push(text('Pas de record cette fois.', { ...TYPE.caption, align: 'center' }), space(6));
     for (const [exercise, list] of byExercise) {
-      blocks.push(text(`★ ${exercise}`, { ...TYPE.strong, family: 'Archivo Black', weight: 400 }));
+      const line = list
+        .map((r) => `${SHORT[r.label] ?? r.label} ${num(r.label === 'Poids max' ? r.value : Math.round(r.value))}`)
+        .join(' · ');
+      blocks.push(starTitle(exercise), text(line, TYPE.caption), space(6));
+    }
+  } else if (prs.length || firsts.length) {
+    blocks.push(space(6), text(prs.length ? `Records · ${prs.length}` : 'Records', TYPE.section), space(6));
+    for (const [exercise, list] of byExercise) {
+      blocks.push(starTitle(exercise));
       for (const r of list) {
         const delta = r.unit === 'reps' ? `+${r.delta}` : `+${num(r.delta)}`;
         blocks.push(text(`${r.label} : ${num(r.value)} ${r.unit} (${delta})`, TYPE.caption));
@@ -376,7 +399,7 @@ async function buildRecap(v) {
     blocks.push(text(`Comparé à ${scanned - 1} séance${scanned - 1 > 1 ? 's' : ''}`, { ...TYPE.caption, align: 'right' }), rule({ style: 'dashed', thickness: 2, margin: 6 }));
   }
 
-  if (v.showSets) {
+  if (!short) {
     workout.exercises.forEach((ex, i) => {
       const star = prByTemplate.has(ex.exercise_template_id) ? ' ★' : '';
       blocks.push(space(6), text(`${i + 1}. ${ex.title}${star}`, TYPE.strong));
