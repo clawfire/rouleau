@@ -16,6 +16,7 @@
 import specimen from './specimen.js';
 import badge from './badge.js';
 import bujo from './bujo.js';
+import focus from './focus.js';
 import morning from './morning.js';
 import oracle from './oracle.js';
 import qr from './qr.js';
@@ -25,13 +26,13 @@ export const MODULES = [
   workout,
   morning,
   bujo,
+  focus,
   qr,
   badge,
   oracle,
   specimen,
   { id: 'photo', label: 'Labo photo', icon: 'camera-retro', soon: true },
   { id: 'tasks', label: 'Tickets de tâches', icon: 'list-check', soon: true },
-  { id: 'focus', label: 'Ticket de focus', icon: 'bullseye', soon: true },
   { id: 'games', label: 'Jeux', icon: 'puzzle-piece', soon: true },
 ];
 
