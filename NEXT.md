@@ -27,6 +27,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 
 - [x] Hevy API with a real key via `npm run dev`: routines, workouts, set fields, warm-up exclusion, duration-only sets, 78-workout history (all scanned)
 - [x] PR detection on real history (totals checked by hand against the raw workout). Custom exercises have their own template id and are rightly treated as "new".
+- [x] `failure` and `dropset` sets (workout of 18 Oct 2026, Chest Press): tags F / D shown, counted in totals and records, totals checked by hand
 - [x] Web Bluetooth printing to the T02
 - [x] CDN assets: Brutalist fonts (fonts.bunny.net: Space Grotesk, IBM Plex Sans Condensed) and 17 Font Awesome icons (ka-f.fontawesome.com, v7.3.0) all load with HTTP 200, no font errors. The app is **not** offline-capable: both CDNs are needed (self-hosting is an option).
 - [x] Preview margins (48 mm print + 4 mm paper each side)
@@ -34,7 +35,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 ## Still untested
 
 - [ ] ⌘P multi-page output through the driver
-- [ ] PR detection with `failure` / `dropset` sets and `rep_range` (not present in the test data)
+- [ ] `rep_range` sets (not present in the test data)
 
 ## Known gaps / ideas
 
