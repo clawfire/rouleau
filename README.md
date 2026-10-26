@@ -88,7 +88,10 @@ Block builders: `text` (options include `invert` for black bands, `frame` for ou
 
 ### Séance de sport (Hevy)
 
-Prints a Hevy routine: one drawn checkbox per set, a write-in line for what you actually lifted, last session's numbers, rest times, and a notes + energy zone.
+Two tickets:
+
+- **Séance à faire**: a Hevy routine with one drawn checkbox per set, a write-in line for what you actually lifted, last session's numbers, rest times, and a notes + energy zone.
+- **Bilan**: the latest (or a chosen) workout, to stick in a notebook: duration, volume, sets, reps, personal records (max weight, estimated 1RM, best set volume; max reps for bodyweight) compared to the last N workouts, and the set detail with RPE. Warm-ups are left out of totals and records.
 
 - Paste your Hevy API key (Hevy Pro › Settings › Developer). It stays in your browser's localStorage.
 - Without a key, the preview uses a demo routine.
