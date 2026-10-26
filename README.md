@@ -2,7 +2,7 @@
 
 A small web app that generates things to print on a **Phomemo T02** thermal printer (48 mm paper, 384 dots, 203 dpi): font specimens today; morning tickets, workout sheets, task tickets, puzzles and more tomorrow.
 
-Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, works offline (except the icon CDN).
+Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, no backend (the Brutalist theme fonts and the icons load from CDNs).
 
 ## Quick start
 
