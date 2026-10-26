@@ -11,6 +11,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
     - *Bilan*: last (or chosen) Hevy workout, totals grid + PRs; formats *Court* (default, ~7 cm) and *Complet*
     - *Vierge*: no Hevy, N exercises × M sets with kg / reps / effort fields
   - **Spécimen de fonts** (`src/modules/specimen.js`)
+  - **QR utilitaires** (`src/modules/qr.js`, payloads + matrix in `src/services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
   - **Ticket du matin** (`src/modules/morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable
 - UI: Web Awesome Pro, Brutalist theme. Preview shows 4 mm of paper on each side of the 48 mm print.
 
@@ -35,6 +36,9 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 
 ## Still untested
 
+- [ ] QR codes on real paper with a phone camera (decoded fine from the rendered bitmaps, never scanned off a printed ticket; try 3-dot modules, correction M vs Q)
+- [ ] QR types never opened on a real phone: SMSTO, WhatsApp, geo, vCard import on iOS and Android
+
 - [ ] Ticket du matin with a real Google iCal address (parser checked on a synthetic feed: RRULE, EXDATE, RECURRENCE-ID override, CANCELLED, UTC, all-day; the `/gcal` proxy reaches Google)
 - [ ] Ticket du matin weather with the browser position (tested with a typed city only)
 - [ ] ⌘P multi-page output through the driver
@@ -53,7 +57,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 2. Tickets de tâches: GitHub/Jira issue → ticket with Octicons (MIT), mono font, QR to the issue
 3. Ticket de focus · L'oracle (quick wins)
 4. Jeux: sudoku, Star Battle (Queens-like), Numberlink (Zip-like), unique solution via solver; patterns instead of colours
-5. QR utilitaires · Badges (name, role, dithered photo, vCard QR, CSV import)
+5. ~~QR utilitaires~~ done · Badges (reuse `qr-payload.js` for the vCard QR) (name, role, dithered photo, vCard QR, CSV import)
 6. Labo photo: brightness / contrast / gamma + dither choice, stickers & text, webcam photo-booth strip
 
 ## Setup reminder

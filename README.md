@@ -49,7 +49,8 @@ src/
 ├── modules/
 │   ├── index.js       # registry (+ roadmap entries)
 │   ├── specimen.js    # font specimen ticket
-│   └── morning.js     # weather + agenda + priorities + quote
+│   ├── morning.js     # weather + agenda + priorities + quote
+│   └── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
 ├── ui/controls.js     # control schema → Web Awesome form components
 ├── fonts.js           # font registry (all SIL OFL)
 └── main.js            # app shell
@@ -107,6 +108,15 @@ Date, then four sections you switch on or off: **weather**, **agenda**, **three 
 - **Weather**: [Open-Meteo](https://open-meteo.com) (free, no key). Uses the browser position (allow it once, it is remembered for 6 h), or the city you type. Shows max / min, sky, rain chance, wind, 9h / 14h / 19h temperatures and sunrise / sunset.
 - **Agenda**: paste the *secret address in iCal format* of your Google Calendar (Calendar settings › Integrate calendar), one per line. No OAuth. Recurring events, exceptions, cancellations and time zones are handled by [ical.js](https://github.com/kewisch/ical.js). Optionally add tomorrow. Like Hevy, Google sends no CORS headers: `npm run dev` proxies `/gcal` to `calendar.google.com`. The secret address gives read access to your calendar, so it stays in your browser's localStorage only.
 - Without an iCal address, the preview shows a demo agenda.
+
+### QR utilitaires
+
+Wi-Fi, contact (vCard), link, free text, SMS, call, e-mail, WhatsApp, GPS position. Each type has its own form and produces the format a phone camera understands (`WIFI:…`, vCard 3.0, `SMSTO:…`, `tel:`, `mailto:`, `geo:`). Reserved characters are escaped; accents and emoji go through as UTF-8.
+
+- The code is drawn module by module at an **integer** size (never under 3 dots per module, never wider than the paper), thresholded and never dithered. A grey module would not scan, so `wa-qr-code` (a canvas at an arbitrary pixel size, no module matrix) is not used here; the matrix comes from [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) (MIT).
+- Size in mm and error correction (L / M / Q / H) are adjustable; a dense code (a full vCard is 69 × 69 modules) comes out larger than requested rather than unreadable.
+- The useful details are printed under the code (network and password, name and number…), so the paper still makes sense without scanning it.
+- Checked end to end: every payload type, at every correction level, and the rendered ticket bitmaps decode back to the exact payload (jsQR), including at half resolution.
 
 ### Spécimen de fonts
 
