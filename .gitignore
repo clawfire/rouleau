@@ -13,3 +13,6 @@ skills-lock.json
 
 # Local Netlify folder
 .netlify
+
+# /brag video output
+brag-output*/
