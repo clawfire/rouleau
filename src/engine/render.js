@@ -8,9 +8,10 @@ import { PRINT_WIDTH } from './constants.js';
  */
 async function ensureFonts(blocks) {
   if (!document.fonts?.load) return;
-  const fonts = new Set(
-    blocks.filter((b) => ['text', 'row', 'check'].includes(b.type)).map((b) => fontString(b)),
-  );
+  const fonts = new Set([
+    ...blocks.filter((b) => ['text', 'row', 'check'].includes(b.type)).map((b) => fontString(b)),
+    ...blocks.flatMap((b) => b.fonts ?? []), // `draw` blocks list the fonts they use
+  ]);
   await Promise.all([...fonts].map((f) => document.fonts.load(f, 'AaÉé09€').catch(() => null)));
 }
 

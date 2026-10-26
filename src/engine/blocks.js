@@ -56,7 +56,8 @@ export const gradient = (o = {}) => ({ type: 'gradient', height: 40, dither: 'at
  * Escape hatch: draw anything with the Canvas 2D API.
  * @param {number} height
  * @param {(ctx: CanvasRenderingContext2D, width: number, height: number) => void} draw
- * @param {{ mode?: 'threshold'|'dither', dither?: string, level?: number }} [o]
+ * @param {{ mode?: 'threshold'|'dither', dither?: string, level?: number, fonts?: string[] }} [o]
+ *   fonts: CSS font strings used by `fn`, loaded before drawing
  */
 export const draw = (height, fn, o = {}) => ({ type: 'draw', height, fn, mode: 'threshold', ...o });
 

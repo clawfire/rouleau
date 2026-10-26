@@ -1,14 +1,17 @@
 /**
- * Workout sheet: a Hevy routine printed with a drawn checkbox per set,
- * a write-in line for what was actually lifted, and last session's numbers.
+ * Workout tickets, from Hevy:
+ *  - plan:  a routine with a drawn checkbox per set, a write-in line and last session's numbers
+ *  - recap: the last (or a chosen) workout with totals and personal records, to stick in a notebook
  */
 import { check, draw, lines, row, rule, space, text } from '../engine/blocks.js';
 import { TYPE } from '../fonts.js';
 import { HevyError, clearHevyCache, lastSetsByTemplate, listRoutines, recentWorkouts } from '../services/hevy.js';
+import { findRecords, summarize } from './workout-stats.js';
 
 /* ---------- Formatting ---------- */
 
-const num = (n) => Number(n).toLocaleString('fr-LU', { maximumFractionDigits: 1 });
+/** 1111.2 → "1 111,2" (plain space: the narrow no-break space has no glyph in our fonts). */
+const num = (n) => Number(n).toLocaleString('fr-FR', { maximumFractionDigits: 1 }).replace(/\s/g, ' ');
 
 const duration = (s) => {
   const m = Math.floor(s / 60);
@@ -76,26 +79,91 @@ const DEMO_LAST = new Map([
   ['demo-squat', { date: new Date(Date.now() - 3 * 864e5).toISOString(), sets: [{ weight_kg: 67.5, reps: 8 }, { weight_kg: 67.5, reps: 8 }, { weight_kg: 67.5, reps: 7 }] }],
 ]);
 
+/* ---------- Demo workout for the recap (no API key) ---------- */
+
+const DEMO_DONE = {
+  id: 'demo-done',
+  title: 'Full Body 2 (démo)',
+  start_time: new Date(Date.now() - 864e5).toISOString(),
+  end_time: new Date(Date.now() - 864e5 + 71 * 60000).toISOString(),
+  exercises: [
+    {
+      title: 'Hack Squat (Machine)',
+      exercise_template_id: 'demo-hack',
+      sets: [
+        { type: 'warmup', weight_kg: 55, reps: 10, rpe: 6 },
+        { type: 'normal', weight_kg: 92.5, reps: 12, rpe: 7 },
+        { type: 'normal', weight_kg: 92.5, reps: 12, rpe: 7.5 },
+        { type: 'normal', weight_kg: 92.5, reps: 12, rpe: 8 },
+      ],
+    },
+    {
+      title: 'Seated Cable Row (Cable)',
+      exercise_template_id: 'demo-row',
+      sets: [
+        { type: 'normal', weight_kg: 73, reps: 12, rpe: 8 },
+        { type: 'normal', weight_kg: 73, reps: 12, rpe: 8.5 },
+        { type: 'normal', weight_kg: 73, reps: 12, rpe: 9 },
+      ],
+    },
+    {
+      title: 'Lying Leg Curl (Machine)',
+      exercise_template_id: 'demo-curl',
+      sets: [
+        { type: 'normal', weight_kg: 59, reps: 15 },
+        { type: 'normal', weight_kg: 59, reps: 15 },
+      ],
+    },
+  ],
+};
+
+const DEMO_HISTORY = [
+  DEMO_DONE,
+  {
+    id: 'demo-prev',
+    start_time: new Date(Date.now() - 5 * 864e5).toISOString(),
+    exercises: [
+      { exercise_template_id: 'demo-hack', sets: [{ weight_kg: 90, reps: 12 }] },
+      { exercise_template_id: 'demo-row', sets: [{ weight_kg: 73, reps: 12 }] },
+    ],
+  },
+];
+
 /* ---------- Module ---------- */
 
 export default {
   id: 'workout',
   label: 'Séance de sport',
   icon: 'dumbbell',
-  description: 'Ta routine Hevy sur papier : une case par série, la place de noter ce que tu as soulevé, et tes chiffres de la dernière fois.',
+  description: 'Avant : ta routine Hevy avec une case par série. Après : le bilan de ta dernière séance et tes records, à coller dans ton carnet.',
 
   defaults: {
+    mode: 'plan',
     apiKey: '',
     routineId: '',
+    workoutId: '',
     showLast: true,
     writeIn: true,
     showRest: true,
     notes: true,
+    showSets: true,
+    showRpe: true,
+    historyPages: 10,
   },
 
-  /** Async: the routine picker needs the API key. */
+  /** Async: pickers need the API key. */
   async controls(v) {
     const schema = [
+      {
+        type: 'radio',
+        key: 'mode',
+        label: 'Ticket',
+        refresh: true,
+        options: [
+          { value: 'plan', label: 'Séance à faire' },
+          { value: 'recap', label: 'Bilan' },
+        ],
+      },
       {
         type: 'text',
         key: 'apiKey',
@@ -107,109 +175,254 @@ export default {
     ];
 
     if (!v.apiKey) {
-      schema.push({ type: 'callout', variant: 'neutral', text: "Sans clé, l'aperçu utilise une séance de démo." });
+      schema.push({ type: 'callout', variant: 'neutral', text: "Sans clé, l'aperçu utilise des données de démo." });
     } else {
       try {
         clearHevyCache();
-        const routines = await listRoutines(v.apiKey);
-        if (!routines.length) {
-          schema.push({ type: 'callout', variant: 'warning', text: 'Aucune routine dans ton compte Hevy.' });
-        } else {
-          if (!routines.some((r) => r.id === v.routineId)) v.routineId = routines[0].id;
+        if (v.mode === 'recap') {
+          const workouts = await recentWorkouts(v.apiKey, 1);
+          if (!workouts.some((w) => w.id === v.workoutId)) v.workoutId = 'latest';
           schema.push({
             type: 'select',
-            key: 'routineId',
-            label: 'Routine',
-            options: routines.map((r) => ({ value: r.id, label: r.title })),
+            key: 'workoutId',
+            label: 'Séance',
+            options: [
+              { value: 'latest', label: 'La plus récente' },
+              ...workouts.map((w) => ({ value: w.id, label: `${shortDate(w.start_time)} · ${w.title}` })),
+            ],
           });
+        } else {
+          const routines = await listRoutines(v.apiKey);
+          if (!routines.length) {
+            schema.push({ type: 'callout', variant: 'warning', text: 'Aucune routine dans ton compte Hevy.' });
+          } else {
+            if (!routines.some((r) => r.id === v.routineId)) v.routineId = routines[0].id;
+            schema.push({
+              type: 'select',
+              key: 'routineId',
+              label: 'Routine',
+              options: routines.map((r) => ({ value: r.id, label: r.title })),
+            });
+          }
         }
       } catch (err) {
         schema.push({ type: 'callout', variant: 'danger', text: err instanceof HevyError ? err.message : String(err) });
       }
     }
 
-    schema.push(
-      { type: 'switch', key: 'showLast', label: 'Afficher la dernière fois' },
-      { type: 'switch', key: 'writeIn', label: 'Ligne pour noter le réalisé' },
-      { type: 'switch', key: 'showRest', label: 'Temps de repos' },
-      { type: 'switch', key: 'notes', label: 'Zone notes + énergie' },
-    );
+    if (v.mode === 'recap') {
+      schema.push(
+        {
+          type: 'slider',
+          key: 'historyPages',
+          label: 'Historique pour les records',
+          hint: 'En paquets de 10 séances. Plus = records plus fiables, chargement plus long.',
+          min: 1,
+          max: 30,
+          step: 1,
+        },
+        { type: 'switch', key: 'showSets', label: 'Détail des séries' },
+        { type: 'switch', key: 'showRpe', label: 'RPE' },
+      );
+    } else {
+      schema.push(
+        { type: 'switch', key: 'showLast', label: 'Afficher la dernière fois' },
+        { type: 'switch', key: 'writeIn', label: 'Ligne pour noter le réalisé' },
+        { type: 'switch', key: 'showRest', label: 'Temps de repos' },
+        { type: 'switch', key: 'notes', label: 'Zone notes + énergie' },
+      );
+    }
     return schema;
   },
 
-  async build(v) {
-    let routine = DEMO;
-    let last = DEMO_LAST;
-    if (v.apiKey) {
-      const routines = await listRoutines(v.apiKey);
-      routine = routines.find((r) => r.id === v.routineId) ?? routines[0];
-      if (!routine) return [text('Aucune routine Hevy.', TYPE.body)];
-      last = new Map();
-      if (v.showLast) {
-        try {
-          last = lastSetsByTemplate(await recentWorkouts(v.apiKey));
-        } catch {
-          // History is a bonus; print the sheet anyway.
-        }
+  build(v) {
+    return v.mode === 'recap' ? buildRecap(v) : buildPlan(v);
+  },
+};
+
+/* ---------- "Séance à faire" ---------- */
+
+async function buildPlan(v) {
+  let routine = DEMO;
+  let last = DEMO_LAST;
+  if (v.apiKey) {
+    const routines = await listRoutines(v.apiKey);
+    routine = routines.find((r) => r.id === v.routineId) ?? routines[0];
+    if (!routine) return [text('Aucune routine Hevy.', TYPE.body)];
+    last = new Map();
+    if (v.showLast) {
+      try {
+        last = lastSetsByTemplate(await recentWorkouts(v.apiKey));
+      } catch {
+        // History is a bonus; print the sheet anyway.
       }
     }
+  }
 
-    const exercises = routine.exercises ?? [];
-    const setCount = exercises.reduce((n, e) => n + (e.sets?.length ?? 0), 0);
-    const today = new Date().toLocaleDateString('fr-LU', { weekday: 'long', day: 'numeric', month: 'long' });
+  const exercises = routine.exercises ?? [];
+  const setCount = exercises.reduce((n, e) => n + (e.sets?.length ?? 0), 0);
+  const today = new Date().toLocaleDateString('fr-LU', { weekday: 'long', day: 'numeric', month: 'long' });
 
-    const blocks = [
-      text('Séance', TYPE.section),
-      space(8),
-      text(routine.title, { ...TYPE.title, size: 32, align: 'center' }),
-      space(4),
-      text(today, { ...TYPE.caption, align: 'center' }),
-      row(`${exercises.length} exos`, `${setCount} séries`, TYPE.caption),
-      rule({ style: 'zigzag', thickness: 2 }),
-    ];
+  const blocks = [
+    text('Séance', TYPE.section),
+    space(8),
+    text(routine.title, { ...TYPE.title, size: 32, align: 'center' }),
+    space(4),
+    text(today, { ...TYPE.caption, align: 'center' }),
+    row(`${exercises.length} exos`, `${setCount} séries`, TYPE.caption),
+    rule({ style: 'zigzag', thickness: 2 }),
+  ];
 
-    exercises.forEach((ex, i) => {
-      blocks.push(space(6), text(`${i + 1}. ${ex.title}`, TYPE.strong));
+  exercises.forEach((ex, i) => {
+    blocks.push(space(6), text(`${i + 1}. ${ex.title}`, TYPE.strong));
 
-      const meta = [];
-      if (v.showRest && ex.rest_seconds) meta.push(`repos ${duration(ex.rest_seconds)}`);
-      if (ex.notes) meta.push(ex.notes);
-      if (meta.length) blocks.push(text(meta.join(' · '), TYPE.caption));
-      blocks.push(space(4));
+    const meta = [];
+    if (v.showRest && ex.rest_seconds) meta.push(`repos ${duration(ex.rest_seconds)}`);
+    if (ex.notes) meta.push(ex.notes);
+    if (meta.length) blocks.push(text(meta.join(' · '), TYPE.caption));
+    blocks.push(space(4));
 
+    let n = 0;
+    for (const set of ex.sets ?? []) {
+      const tag = TAGS[set.type] ?? String(++n);
+      blocks.push(check(tag, formatSet(set), { write: v.writeIn }));
+    }
+
+    const prev = v.showLast && ex.exercise_template_id ? last.get(ex.exercise_template_id) : null;
+    if (prev?.sets?.length) {
+      const date = new Date(prev.date).toLocaleDateString('fr-LU', { day: '2-digit', month: '2-digit' });
+      const sets = prev.sets.filter((s) => s.type !== 'warmup').map(shortSet).join(' · ');
+      blocks.push(space(2), text(`Dernière fois (${date}) : ${sets}`, TYPE.caption));
+    }
+    blocks.push(space(4), rule({ style: 'dashed', thickness: 2, margin: 6 }));
+  });
+
+  if (v.notes) {
+    blocks.push(
+      space(6),
+      text('Notes', TYPE.section),
+      lines(3),
+      space(10),
+      energyRow(),
+    );
+  }
+
+  blocks.push(
+    space(8),
+    text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
+    rule({ style: 'zigzag', thickness: 2 }),
+  );
+  return blocks;
+}
+
+/* ---------- "Bilan" ---------- */
+
+const shortDate = (iso) => new Date(iso).toLocaleDateString('fr-LU', { day: '2-digit', month: '2-digit' });
+
+const hm = (minutes) => (minutes >= 60 ? `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min`);
+
+/** 12493 → "12 493" (plain space: the narrow no-break space has no glyph in our fonts). */
+const bigNum = (n) => Math.round(n).toLocaleString('fr-FR').replace(/\s/g, ' ');
+
+async function buildRecap(v) {
+  let workout = DEMO_DONE;
+  let history = DEMO_HISTORY;
+  let scanned = DEMO_HISTORY.length;
+  if (v.apiKey) {
+    history = await recentWorkouts(v.apiKey, Number(v.historyPages) || 10);
+    scanned = history.length;
+    workout = (v.workoutId && v.workoutId !== 'latest' && history.find((w) => w.id === v.workoutId)) || history[0];
+    if (!workout) return [text('Aucune séance dans Hevy.', TYPE.body)];
+  }
+
+  const sum = summarize(workout);
+  const records = findRecords(workout, history);
+  const prByTemplate = new Set(records.filter((r) => !r.first).map((r) => r.templateId));
+  const when = new Date(workout.start_time);
+  const date = when.toLocaleDateString('fr-LU', { weekday: 'long', day: 'numeric', month: 'long' });
+  const time = when.toLocaleTimeString('fr-LU', { hour: '2-digit', minute: '2-digit' });
+
+  const blocks = [
+    text('Bilan', TYPE.section),
+    space(8),
+    text(workout.title, { ...TYPE.title, size: 32, align: 'center' }),
+    space(4),
+    text(`${date} · ${time}`, { ...TYPE.caption, align: 'center' }),
+    space(8),
+    statsGrid([
+      [hm(sum.minutes), 'durée'],
+      [`${bigNum(sum.volume)} kg`, 'volume'],
+      [String(sum.sets), 'séries'],
+      [String(sum.reps), 'reps'],
+    ]),
+    rule({ style: 'zigzag', thickness: 2 }),
+  ];
+
+  const prs = records.filter((r) => !r.first);
+  const firsts = records.filter((r) => r.first);
+  if (prs.length || firsts.length) {
+    blocks.push(space(6), text(prs.length ? `Records · ${prs.length}` : 'Records', TYPE.section), space(6));
+    const byExercise = new Map();
+    for (const r of prs) byExercise.set(r.exercise, [...(byExercise.get(r.exercise) ?? []), r]);
+    for (const [exercise, list] of byExercise) {
+      blocks.push(text(`★ ${exercise}`, { ...TYPE.strong, family: 'Archivo Black', weight: 400 }));
+      for (const r of list) {
+        const delta = r.unit === 'reps' ? `+${r.delta}` : `+${num(r.delta)}`;
+        blocks.push(text(`${r.label} : ${num(r.value)} ${r.unit} (${delta})`, TYPE.caption));
+      }
+      blocks.push(space(6));
+    }
+    if (firsts.length) blocks.push(text(`Nouveaux exos : ${firsts.map((r) => r.exercise).join(', ')}`, TYPE.caption));
+    blocks.push(text(`Comparé à ${scanned - 1} séance${scanned - 1 > 1 ? 's' : ''}`, { ...TYPE.caption, align: 'right' }), rule({ style: 'dashed', thickness: 2, margin: 6 }));
+  }
+
+  if (v.showSets) {
+    workout.exercises.forEach((ex, i) => {
+      const star = prByTemplate.has(ex.exercise_template_id) ? ' ★' : '';
+      blocks.push(space(6), text(`${i + 1}. ${ex.title}${star}`, TYPE.strong));
       let n = 0;
       for (const set of ex.sets ?? []) {
         const tag = TAGS[set.type] ?? String(++n);
-        blocks.push(check(tag, formatSet(set), { write: v.writeIn }));
-      }
-
-      const prev = v.showLast && ex.exercise_template_id ? last.get(ex.exercise_template_id) : null;
-      if (prev?.sets?.length) {
-        const date = new Date(prev.date).toLocaleDateString('fr-LU', { day: '2-digit', month: '2-digit' });
-        const sets = prev.sets.filter((s) => s.type !== 'warmup').map(shortSet).join(' · ');
-        blocks.push(space(2), text(`Dernière fois (${date}) : ${sets}`, TYPE.caption));
+        const rpe = v.showRpe && set.rpe != null ? `@${num(set.rpe)}` : '';
+        blocks.push(row(`${tag}  ${formatSet(set)}`, rpe, { ...TYPE.mono, leader: false }));
       }
       blocks.push(space(4), rule({ style: 'dashed', thickness: 2, margin: 6 }));
     });
+  }
 
-    if (v.notes) {
-      blocks.push(
-        space(6),
-        text('Notes', TYPE.section),
-        lines(3),
-        space(10),
-        energyRow(),
-      );
-    }
+  blocks.push(
+    space(8),
+    text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
+    rule({ style: 'zigzag', thickness: 2 }),
+  );
+  return blocks;
+}
 
-    blocks.push(
-      space(8),
-      text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
-      rule({ style: 'zigzag', thickness: 2 }),
-    );
-    return blocks;
-  },
-};
+/** 2×2 grid of big numbers with small labels underneath. */
+function statsGrid(cells) {
+  const big = `400 32px "${TYPE.title.family}"`;
+  const small = `400 22px "${TYPE.caption.family}"`;
+  const cellH = 70;
+  return draw(
+    cellH * 2 + 6,
+    (ctx, W) => {
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      cells.forEach(([value, label], i) => {
+        const cx = (i % 2 === 0 ? 0.25 : 0.75) * W;
+        const y0 = Math.floor(i / 2) * (cellH + 6);
+        ctx.font = big;
+        ctx.fillText(value, cx, y0 + 34);
+        ctx.font = small;
+        ctx.fillText(label, cx, y0 + 60);
+      });
+      // Thin cross between the four cells.
+      ctx.fillRect(W / 2 - 1, 4, 2, cellH * 2 - 2);
+      ctx.fillRect(8, cellH + 2, W - 16, 2);
+    },
+    { fonts: [big, small] },
+  );
+}
 
 /** "Énergie  ☐ ☐ ☐ ☐ ☐" with drawn boxes. */
 function energyRow() {
@@ -222,5 +435,5 @@ function energyRow() {
     const gap = 12;
     const start = W - 5 * box - 4 * gap - 2;
     for (let i = 0; i < 5; i++) ctx.strokeRect(start + i * (box + gap) + 1.5, 4 + 1.5, box - 3, box - 3);
-  });
+  }, { fonts: [`400 22px "${TYPE.caption.family}"`] });
 }

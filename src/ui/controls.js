@@ -112,6 +112,7 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
           values[c.key] = node.value;
           emit();
         });
+        refreshOn(node, c, 'change');
         break;
       }
       case 'select': {
