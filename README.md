@@ -82,20 +82,21 @@ Then add it to `MODULES` in `src/modules/index.js`. `build` may be `async` (fetc
 
 Control types: `text`, `textarea`, `slider`, `switch`, `checkboxes`, `radio`, `select`.
 
-Block builders: `text`, `row` (key ……… value), `rule` (`solid` · `dashed` · `dotted` · `zigzag`), `space`, `image` (dithered), `gradient`, `draw` (raw Canvas 2D).
+Block builders: `text` (options include `frame` for outlined bands), `row` (key ……… value), `rule` (`solid` · `dashed` · `dotted` · `zigzag`), `space`, `image` (dithered), `gradient`, `draw` (raw Canvas 2D).
 
-## Fonts
+## Print notes (tested on paper)
 
-| Font | Use | License |
-|---|---|---|
-| Atkinson Hyperlegible | Body text | OFL |
-| Atkinson Hyperlegible Mono | Lists, numbers | OFL |
-| JetBrains Mono | GitHub / Jira tickets | OFL |
-| IBM Plex Mono | GitHub / Jira tickets | OFL |
-| Departure Mono | Retro receipt look (pixel font: use multiples of 11 px) | OFL, vendored in `src/assets/fonts` |
-| Archivo Black | Headlines, banners | OFL |
+| Topic | Verdict |
+|---|---|
+| Fonts | Atkinson Hyperlegible (body), Departure Mono (mono, receipts, tickets), Archivo Black (titles, best symbols). All SIL OFL. |
+| Text size | 18 px minimum (≈ 2.3 mm). Bold doesn't bleed. Departure Mono: multiples of 11 px, so 22 px min. |
+| Dithering | Atkinson by default (pure whites). Bayer and threshold work well; Floyd–Steinberg never reaches pure white; halftone is meh. |
+| Solid black | Large black areas print **grey**: use outlined bands (`frame`), not `invert`. |
+| Checkboxes | Glyphs are too small: draw them. |
+| Margins | The T02 is not borderless, so no side inset by default. |
+| Density | Receipt paper → max (4). Sticker paper → dark (3). Pick the paper in the app. |
 
-Print the **Spécimen de fonts** ticket to pick yours on real paper. Rule of thumb: ≥ 18 px (≈ 2.2 mm) and weight ≥ 500 for body text.
+Use the `TYPE` presets from `src/fonts.js` in modules rather than raw font names.
 
 ## Web Awesome Pro
 

@@ -11,11 +11,11 @@
 
 /** Available algorithms, in the order the UI lists them. */
 export const DITHERS = [
-  { id: 'atkinson', label: 'Atkinson', hint: 'Look Mac 1984, contrasté, plus clair' },
-  { id: 'floyd', label: 'Floyd–Steinberg', hint: 'Dégradés doux, plus sombre' },
+  { id: 'atkinson', label: 'Atkinson', hint: 'Par défaut : blancs purs, contrasté' },
   { id: 'bayer', label: 'Bayer 8×8', hint: 'Trame régulière, rétro' },
-  { id: 'halftone', label: 'Halftone', hint: 'Points de trame façon journal' },
   { id: 'threshold', label: 'Seuil', hint: 'Noir ou blanc, sans nuance' },
+  { id: 'floyd', label: 'Floyd–Steinberg', hint: 'Doux, mais jamais blanc pur' },
+  { id: 'halftone', label: 'Halftone', hint: 'Points de trame, moyen sur T02' },
 ];
 
 const clamp = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);

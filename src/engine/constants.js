@@ -23,3 +23,15 @@ export const estimatePrintSeconds = (rows) => rows * 0.125 * 0.11;
  * size is 48 × 297 mm (blank space trimmed). Longer tickets are split.
  */
 export const MAX_PAGE_MM = 297;
+
+/** Smallest text size that reads well on the T02 (tested on paper). */
+export const MIN_TEXT_SIZE = 18;
+
+/**
+ * Paper presets → head density (1..4), tested on paper:
+ * receipt paper needs the max, sticker paper prints well one notch lower.
+ */
+export const PAPERS = {
+  ticket: { label: 'Ticket de caisse', density: 4 },
+  sticker: { label: 'Autocollant', density: 3 },
+};

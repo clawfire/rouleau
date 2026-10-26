@@ -25,7 +25,9 @@ import { adjust, dither, luminance, threshold } from './dither.js';
  * @param {number} [o.lineHeight=1.15]  multiple of the font's natural height
  * @param {number} [o.letterSpacing=0]  px
  * @param {number} [o.level=128]        threshold 0..255; higher = bolder
- * @param {boolean} [o.invert=false]    white text on a black band
+ * @param {boolean} [o.invert=false]    white text on a black band. ⚠️ Large solid areas print GREY
+ *                                      on the T02 (the head limits energy per line): prefer `frame`.
+ * @param {boolean|number} [o.frame=false] outlined band; a number sets the border thickness (default 3)
  * @param {number} [o.padY=0]           vertical padding inside the band
  * @param {string} [o.transform]        'uppercase'
  */
@@ -131,8 +133,10 @@ function toBits(ctx, width, height, mode = 'threshold', opts = {}) {
 
 function renderText(b, W, inset) {
   const content = b.transform === 'uppercase' ? b.content.toUpperCase() : b.content;
-  const padY = b.padY ?? (b.invert ? 6 : 0);
-  const padX = b.invert ? Math.max(inset, 8) : inset;
+  const boxed = b.invert || b.frame;
+  const border = b.frame ? (b.frame === true ? 3 : Number(b.frame)) : 0;
+  const padY = b.padY ?? (boxed ? 6 + border : 0);
+  const padX = boxed ? inset + 8 + border : inset;
   const probe = makeCanvas(1, 1).ctx;
   const metrics = setupText(probe, b);
   const lines = wrap(probe, content, W - padX * 2);
@@ -147,6 +151,7 @@ function renderText(b, W, inset) {
     ctx.fillText(line, Math.round(x), y);
   });
   const bmp = toBits(ctx, W, H, 'threshold', { level: b.level });
+  if (border) bmp.strokeRect(inset, 0, W - inset * 2, H, border);
   return b.invert ? bmp.invert() : bmp;
 }
 
@@ -233,7 +238,7 @@ function renderDraw(b, W) {
  * @param {{ width?: number, inset?: number }} [o]
  * @returns {Bitmap}
  */
-export function renderBlock(block, { width = PRINT_WIDTH, inset = 8 } = {}) {
+export function renderBlock(block, { width = PRINT_WIDTH, inset = 0 } = {}) {
   switch (block.type) {
     case 'text':
       return renderText(block, width, inset);

@@ -18,10 +18,11 @@ async function ensureFonts(blocks) {
  * Turn a list of blocks into the final 1-bit ticket.
  * @param {object[]} blocks
  * @param {{ inset?: number, top?: number, bottom?: number, width?: number }} [o]
- *   inset: horizontal margin in dots, top/bottom: blank dots around the content
+ *   inset: horizontal margin in dots (0: the T02 already leaves a physical margin),
+ *   top/bottom: blank dots around the content
  * @returns {Promise<Bitmap>}
  */
-export async function renderTicket(blocks, { inset = 8, top = 8, bottom = 16, width = PRINT_WIDTH } = {}) {
+export async function renderTicket(blocks, { inset = 0, top = 8, bottom = 16, width = PRINT_WIDTH } = {}) {
   await ensureFonts(blocks);
   const parts = [Bitmap.blank(top, width)];
   for (const b of blocks) {

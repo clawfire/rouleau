@@ -26,7 +26,7 @@ import '@awesome.me/webawesome-pro/dist/components/option/option.js';
 import './fonts.js';
 import './styles.css';
 
-import { MAX_PAGE_MM, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
+import { MAX_PAGE_MM, PAPERS, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
 import { paginate } from './engine/paginate.js';
 import { renderTicket } from './engine/render.js';
 import { MODULES, moduleById } from './modules/index.js';
@@ -79,7 +79,7 @@ applyScheme();
 const state = {
   module: null,
   values: {},
-  print: store.get('print', { density: '2', feedMm: 0 }),
+  print: store.get('print', { paper: 'ticket', feedMm: 0 }),
   bitmap: null,
   renderId: 0,
 };
@@ -179,15 +179,10 @@ function updateMeta(bitmap) {
 const PRINT_CONTROLS = [
   {
     type: 'radio',
-    key: 'density',
-    label: 'Densité',
-    hint: 'Plus foncé = plus de chauffe, plus lent.',
-    options: [
-      { value: '1', label: 'Léger' },
-      { value: '2', label: 'Normal' },
-      { value: '3', label: 'Foncé' },
-      { value: '4', label: 'Max' },
-    ],
+    key: 'paper',
+    label: 'Papier',
+    hint: "Règle la densité de chauffe (Bluetooth). Avec ⌘P, c'est l'option Densité du driver.",
+    options: Object.entries(PAPERS).map(([value, p]) => ({ value, label: p.label })),
   },
   {
     type: 'slider',
@@ -230,7 +225,7 @@ $('#btn-ble').addEventListener('click', async (e) => {
   try {
     if (!printer.connected) setStatus('Recherche de la T02…');
     await printer.print(state.bitmap, {
-      density: Number(state.print.density),
+      density: (PAPERS[state.print.paper] ?? PAPERS.ticket).density,
       extraFeed: mmToDots(Number(state.print.feedMm) || 0),
       onProgress: (r) => setStatus(`Envoi… ${Math.round(r * 100)} %`),
     });

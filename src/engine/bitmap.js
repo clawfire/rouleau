@@ -25,6 +25,16 @@ export class Bitmap {
     this.data[y * this.width + x] = v ? 1 : 0;
   }
 
+  /** Draw a rectangle outline of thickness t, inside the given box. */
+  strokeRect(x, y, w, h, t = 1) {
+    for (let yy = y; yy < y + h; yy++) {
+      for (let xx = x; xx < x + w; xx++) {
+        if (xx < x + t || xx >= x + w - t || yy < y + t || yy >= y + h - t) this.set(xx, yy);
+      }
+    }
+    return this;
+  }
+
   /** Swap black and white (useful for inverted header bands). */
   invert() {
     for (let i = 0; i < this.data.length; i++) this.data[i] ^= 1;

@@ -3,17 +3,15 @@
  * plus a comparison of dithering algorithms, so choices are made on real paper.
  */
 import { gradient, row, rule, space, text } from '../engine/blocks.js';
-import { dotsToMm } from '../engine/constants.js';
+import { MIN_TEXT_SIZE, dotsToMm } from '../engine/constants.js';
 import { DITHERS } from '../engine/dither.js';
-import { FONTS } from '../fonts.js';
-
-const CAPTION = { family: 'Departure Mono', size: 11, align: 'left' };
+import { FONTS, TYPE } from '../fonts.js';
 
 const parseSizes = (s) =>
   String(s ?? '')
     .split(/[,\s;]+/)
     .map(Number)
-    .filter((n) => Number.isFinite(n) && n >= 6 && n <= 160);
+    .filter((n) => Number.isFinite(n) && n >= MIN_TEXT_SIZE && n <= 160);
 
 export default {
   id: 'specimen',
@@ -43,14 +41,14 @@ export default {
       type: 'text',
       key: 'customSizes',
       label: 'Tailles (px)',
-      hint: 'Vide = tailles conseillées par font. Ex. : 16, 20, 24. 8 px ≈ 1 mm.',
+      hint: `Vide = tailles conseillées. Minimum lisible : ${MIN_TEXT_SIZE} px. 8 px ≈ 1 mm.`,
       placeholder: 'auto',
     },
     {
       type: 'slider',
       key: 'level',
       label: 'Seuil du texte',
-      hint: "Plus haut = texte plus gras. 128 = neutre.",
+      hint: 'Plus haut = texte plus gras. 128 = neutre.',
       min: 64,
       max: 200,
       step: 4,
@@ -69,27 +67,20 @@ export default {
     const level = Number(v.level) || 128;
 
     const blocks = [
-      text('Rouleau', { family: 'Archivo Black', size: 56, align: 'center', lineHeight: 1 }),
-      text('spécimen de fonts', { family: 'Departure Mono', size: 22, align: 'center' }),
+      text('Rouleau', { ...TYPE.title, size: 56, align: 'center' }),
+      text('spécimen de fonts', { ...TYPE.mono, align: 'center' }),
       space(6),
-      row(date, time, { family: 'Departure Mono', size: 11 }),
-      row('T02', '384 px · 203 dpi', { family: 'Departure Mono', size: 11 }),
+      row(date, time, TYPE.caption),
       rule({ style: 'zigzag', thickness: 2 }),
     ];
 
     for (const font of FONTS.filter((f) => v.fonts.includes(f.id))) {
       blocks.push(
-        space(6),
-        text(font.label, {
-          family: 'Atkinson Hyperlegible Mono',
-          weight: 700,
-          size: 18,
-          invert: true,
-          transform: 'uppercase',
-        }),
-        space(2),
-        text(font.role + (font.note ? ` · ${font.note}` : ''), { ...CAPTION, size: 11 }),
+        space(8),
+        text(font.label, TYPE.section),
         space(4),
+        text(font.role + (font.note ? ` · ${font.note}` : ''), TYPE.caption),
+        space(6),
       );
 
       const sizes = custom.length ? custom : font.sizes;
@@ -97,18 +88,18 @@ export default {
       for (const weight of weights) {
         for (const size of sizes) {
           blocks.push(
-            text(`${size} px · ${dotsToMm(size).toFixed(1)} mm · ${weight}`, CAPTION),
+            text(`${size} px · ${dotsToMm(size).toFixed(1)} mm · ${weight}`, TYPE.caption),
             text(v.sample || font.label, { family: font.family, size, weight, level }),
-            space(6),
+            space(8),
           );
         }
       }
 
       if (v.charset) {
-        const mid = sizes[Math.floor(sizes.length / 2)] ?? 20;
+        const mid = sizes[Math.floor(sizes.length / 2)] ?? 24;
         blocks.push(
-          text('Caractères', CAPTION),
-          text('0123456789 €$£%&@#*+−=/ ?!«»\nÀÂÉÈÊËÎÏÔÙÛÜÇ àâéèêëîïôùûüç\n→ ✓ ✗ ☐ ☑ ★ ♥ • … — ¶', {
+          text('Caractères', TYPE.caption),
+          text('0123456789 €$£%&@#*+−=/ ?!«»\nÀÂÉÈÊËÎÏÔÙÛÜÇ àâéèêëîïôùûüç\n→ ✓ ✗ ★ ♥ • … — ¶', {
             family: font.family,
             size: mid,
             weight: font.weights[0],
@@ -120,17 +111,12 @@ export default {
     }
 
     if (v.dithers) {
-      blocks.push(
-        space(6),
-        text('Tramages', { family: 'Atkinson Hyperlegible Mono', weight: 700, size: 18, invert: true, transform: 'uppercase' }),
-        space(6),
-      );
+      blocks.push(space(8), text('Tramages', TYPE.section), space(8));
       for (const d of DITHERS) {
         blocks.push(
-          row(d.label, d.hint, { family: 'Departure Mono', size: 11, leader: false }),
-          space(2),
+          text(d.label, TYPE.caption),
           gradient({ dither: d.id, height: 40 }),
-          space(8),
+          space(10),
         );
       }
       blocks.push(rule({ style: 'dashed', thickness: 2 }));
@@ -138,7 +124,7 @@ export default {
 
     blocks.push(
       space(4),
-      text('Imprimé avec Rouleau', { family: 'Departure Mono', size: 11, align: 'center' }),
+      text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
       rule({ style: 'zigzag', thickness: 2 }),
     );
     return blocks;
