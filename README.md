@@ -96,6 +96,15 @@ Block builders: `text`, `row` (key ……… value), `rule` (`solid` · `dashed`
 
 Print the **Spécimen de fonts** ticket to pick yours on real paper. Rule of thumb: ≥ 18 px (≈ 2.2 mm) and weight ≥ 500 for body text.
 
+## Web Awesome Pro (optional)
+
+```bash
+cp .npmrc.example .npmrc          # paste your token, never commit it
+npm install @awesome.me/webawesome-pro   # exact name in your workspace
+```
+
+Then swap the import in `src/main.js` to the Pro package and set the theme on `<html>` in `index.html`, e.g. `class="wa-theme-brutalist wa-palette-default"`.
+
 ## Working with AI agents
 
 Web Awesome ships two [Agent Skills](https://webawesome.com/docs/ai/agent-skills) in `node_modules`. Install them for Claude Code with:
