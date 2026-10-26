@@ -10,3 +10,6 @@ dist/
 .claude/
 .hermes/
 skills-lock.json
+
+# Local Netlify folder
+.netlify
