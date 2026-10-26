@@ -1,4 +1,4 @@
 # Copy to .npmrc (git-ignored) and paste your Web Awesome Pro token.
-# Exact package name and token: https://webawesome.com/workspaces
-@awesome.me:registry=https://npm.fontawesome.com/
-//npm.fontawesome.com/:_authToken=YOUR_TOKEN
+# Token: https://webawesome.com/workspaces
+@awesome.me:registry=https://npm.cloudsmith.io/fortawesome/webawesome-pro/
+//npm.cloudsmith.io/fortawesome/webawesome-pro/:_authToken=YOUR_TOKEN
