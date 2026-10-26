@@ -8,7 +8,7 @@
 
 ## Design system
 
-- UI is built with **Web Awesome** (free components only, no Pro).
+- UI is built with **Web Awesome**. The owner has a Pro licence: Pro themes (e.g. Brutalist) and components are fine once the Pro package is installed (see webawesome.com workspaces, token in a git-ignored .npmrc).
 - Before touching UI, read the skills shipped in `node_modules`:
   - `node_modules/@awesome.me/webawesome/dist/skills/webawesome/` (component APIs)
   - `node_modules/@awesome.me/webawesome/dist/skills/webawesome-design/` (layout, tokens, theming)
@@ -22,6 +22,7 @@
 - Text → threshold. Images and greys → dither. Never dither text.
 - Bitmaps are 1 byte per pixel, `1 = burn`. Packing to printer bytes happens only in `print/raster.js` (MSB first).
 - Keep everything 384 px wide; horizontal inset defaults to 8 px.
+- ⌘P output is split into pages of max 297 mm (driver "Ticket 48 mm" size), cut on block boundaries (`engine/paginate.js`). Bluetooth and PNG are not limited.
 
 ## Roadmap (nav entries flagged `soon`)
 

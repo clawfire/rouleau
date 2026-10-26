@@ -17,3 +17,9 @@ export const mmToDots = (mm) => Math.round(mm * DOTS_PER_MM);
  * (0.125 mm per row, 0.11 s per mm).
  */
 export const estimatePrintSeconds = (rows) => rows * 0.125 * 0.11;
+
+/**
+ * Longest page the macOS driver prints through ⌘P: its "Ticket 48 mm" paper
+ * size is 48 × 297 mm (blank space trimmed). Longer tickets are split.
+ */
+export const MAX_PAGE_MM = 297;

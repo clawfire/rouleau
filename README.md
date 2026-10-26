@@ -19,7 +19,7 @@ Three outputs, from the header bar:
 | Button | How it reaches the T02 | Notes |
 |---|---|---|
 | **Imprimer** | Web Bluetooth, straight from the browser | Chrome / Edge only. Same protocol as the macOS bridge. |
-| **⌘P** | System print dialog → `Phomemo T02` queue of [phomemo-t02-macos](https://github.com/clawfire/phomemo-t02-macos) | The "Ticket 48 mm" paper size trims blank space. |
+| **⌘P** | System print dialog → `Phomemo T02` queue of [phomemo-t02-macos](https://github.com/clawfire/phomemo-t02-macos) | The "Ticket 48 mm" paper size is 297 mm max: longer tickets are split into pages at block boundaries. |
 | **PNG** | 1-bit PNG, 384 px wide | `t02 print rouleau-*.png`, or keep it for later. |
 
 A BLE printer accepts one connection at a time: if the macOS bridge is holding the T02 (keepalive), the browser won't find it. Use ⌘P in that case, or set `keepalive_seconds` to `0` in the bridge config.

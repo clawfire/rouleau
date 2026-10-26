@@ -32,5 +32,10 @@ export async function renderTicket(blocks, { inset = 8, top = 8, bottom = 16, wi
     }
   }
   parts.push(Bitmap.blank(bottom, width));
-  return Bitmap.stack(parts, width);
+  const bitmap = Bitmap.stack(parts, width);
+  // Y offsets between blocks: safe places to cut the ticket into pages.
+  bitmap.breaks = [];
+  let y = 0;
+  for (const p of parts) bitmap.breaks.push((y += p.height));
+  return bitmap;
 }

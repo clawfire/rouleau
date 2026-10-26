@@ -25,7 +25,8 @@ import '@awesome.me/webawesome/dist/components/option/option.js';
 import './fonts.js';
 import './styles.css';
 
-import { dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
+import { MAX_PAGE_MM, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
+import { paginate } from './engine/paginate.js';
 import { renderTicket } from './engine/render.js';
 import { MODULES, moduleById } from './modules/index.js';
 import { T02Bluetooth, isBluetoothAvailable } from './print/bluetooth.js';
@@ -158,6 +159,8 @@ function updateMeta(bitmap) {
     mm >= 100 ? `${(mm / 10).toFixed(1)} cm` : `${Math.round(mm)} mm`,
     `~${Math.max(1, Math.round(estimatePrintSeconds(bitmap.height)))} s`,
   ];
+  const pages = mm > MAX_PAGE_MM ? paginate(bitmap, mmToDots(MAX_PAGE_MM)).length : 1;
+  if (pages > 1) tags.push(`⌘P : ${pages} pages`);
   $('#ticket-meta').replaceChildren(
     ...tags.map((t) => {
       const tag = document.createElement('wa-tag');
