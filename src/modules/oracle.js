@@ -4,6 +4,7 @@
  */
 import { row, rule, space, text } from '../engine/blocks.js';
 import { TYPE } from '../fonts.js';
+import { FONTS as DRAW_FONTS, ball, card, cookie, dice } from './oracle-draw.js';
 
 /* ---------- Seeded randomness ---------- */
 
@@ -113,24 +114,23 @@ const BUILD = {
     const mood = { yes: 'Oui', maybe: 'Peut-être', no: 'Non' }[kind];
     return [
       ...header(v, 'Boule magique'),
-      space(10),
-      text(mood, { ...TYPE.title, size: 72, align: 'center' }),
-      space(8),
-      text(answer, { ...TYPE.body, size: 26, align: 'center' }),
+      space(6),
+      ball(mood, answer),
       ...footer(),
     ];
   },
 
   tarot(v, rand) {
     const three = v.cards === '3';
-    const drawn = shuffle(rand, ARCANA).slice(0, three ? 3 : 1);
+    const drawn = shuffle(rand, ARCANA.map((_, i) => i)).slice(0, three ? 3 : 1);
     const blocks = header(v, three ? 'Tirage en 3 cartes' : 'Une carte');
-    drawn.forEach(([numeral, name, up, down], i) => {
+    drawn.forEach((index, i) => {
+      const [numeral, name, up, down] = ARCANA[index];
       const reversed = rand() < 0.5;
       blocks.push(space(10));
       if (three) blocks.push(text(POSITIONS[i], { ...TYPE.caption, align: 'center' }), space(4));
       blocks.push(
-        text(`${numeral}\n${name}`, { ...TYPE.title, size: 28, lineHeight: 1.15, align: 'center', frame: 4, padY: 10 }),
+        card({ numeral, name, index }, reversed, three ? { w: 200, h: 300 } : { w: 250, h: 400 }),
         space(4),
         text(reversed ? 'renversée' : 'à l’endroit', { ...TYPE.caption, align: 'center' }),
         text(reversed ? down : up, { ...TYPE.body, align: 'center' }),
@@ -147,8 +147,8 @@ const BUILD = {
     const total = rolls.reduce((a, b) => a + b, 0);
     const blocks = [
       ...header(v, `${count} × d${faces}`),
-      space(10),
-      text(rolls.join('  '), { ...TYPE.title, size: count > 4 ? 56 : 80, align: 'center' }),
+      space(6),
+      dice(rolls, faces),
     ];
     if (count > 1) blocks.push(space(10), row('Total', String(total), { ...TYPE.strong, size: 28 }));
     return [...blocks, ...footer()];
@@ -163,11 +163,8 @@ const BUILD = {
     numbers.sort((a, b) => a - b);
     return [
       ...header(v, 'Biscuit'),
-      space(10),
-      text(pick(rand, FORTUNES), { ...TYPE.body, size: 26, align: 'center' }),
-      space(12),
-      text('Tes chiffres', { ...TYPE.caption, align: 'center' }),
-      text(numbers.join('  '), { ...TYPE.strong, size: 30, align: 'center' }),
+      space(6),
+      cookie(pick(rand, FORTUNES), numbers),
       ...footer(),
     ];
   },
@@ -220,7 +217,8 @@ export default {
     return schema;
   },
 
-  build(v) {
+  async build(v) {
+    await Promise.all(DRAW_FONTS.map((f) => document.fonts.load(f, 'AaÉé09').catch(() => null)));
     const rand = prng(v.seed);
     return (BUILD[v.mode] ?? BUILD.ball)(v, rand);
   },

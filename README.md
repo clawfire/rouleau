@@ -52,7 +52,7 @@ src/
 │   ├── morning.js     # weather + agenda + priorities + quote
 │   ├── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
 │   ├── badge.js       # sideways badges (+ badge-draw.js)
-│   └── oracle.js      # 8-ball, tarot, dice, fortune cookie
+│   └── oracle.js      # 8-ball, tarot, dice, fortune cookie (+ oracle-draw.js)
 ├── ui/controls.js     # control schema → Web Awesome form components
 ├── fonts.js           # font registry (all SIL OFL)
 └── main.js            # app shell
@@ -132,7 +132,14 @@ Conference, visitor or "HELLO my name is" badges. The strip is as wide as the pr
 
 ### L'oracle
 
-A ticket that answers a question: **magic 8-ball** (17 answers, yes / maybe / no), **tarot** (22 major arcana, one card or past · present · future, upright or reversed), **dice** (1–8 dice, d4 to d100, with the total) and **fortune cookie** (a fortune and six lucky numbers). The draw is seeded: the preview and the print show the same answer until you press *Tirer à nouveau*.
+A ticket that answers a question, with the answer *drawn* (all in Canvas 2D, black on white, thresholded):
+
+- **Magic 8-ball**: a black ball with its glare and its "8", the answer (Oui / Peut-être / Non + the sentence) in the round window. 17 answers.
+- **Tarot**: the 22 major arcana, printed as real cards (double frame, numeral, an emblem drawn for each arcanum, name band). One card or past · present · future; a reversed card has its emblem upside down, and its keywords are printed under it.
+- **Dice**: real dice. A d6 has its pips, the others are drawn as polyhedra (d4 triangle, d8 and d10 diamonds, d12 pentagon with facets, d20 hexagon, d100 as a d10 with two or three digits), 1 to 8 of them, with the total.
+- **Fortune cookie**: a broken cookie holding the paper slip with the fortune and six lucky numbers.
+
+The draw is seeded: the preview and the print show the same answer until you press *Tirer à nouveau*. Drawings live in `src/modules/oracle-draw.js`.
 
 ### Spécimen de fonts
 
