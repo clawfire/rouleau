@@ -375,7 +375,7 @@ const EMBLEMS = [
 ];
 
 /**
- * A tarot card: double frame, numeral, emblem, name band. A reversed card has its emblem upside down.
+ * A tarot card: double frame, numeral, emblem, name band. A reversed card is turned upside down as a whole.
  * @param {{ numeral: string, name: string, index: number }} card
  */
 export function card({ numeral, name, index }, reversed, { w = 250, h = 400 } = {}) {
@@ -387,6 +387,12 @@ export function card({ numeral, name, index }, reversed, { w = 250, h = 400 } = 
     (ctx) => {
       const x = (W - w) / 2;
       const y = 7;
+      // a reversed card is the whole card turned upside down: frame, numeral, emblem and name
+      if (reversed) {
+        ctx.translate(W / 2, y + h / 2);
+        ctx.rotate(Math.PI);
+        ctx.translate(-W / 2, -(y + h / 2));
+      }
       ctx.strokeStyle = '#000';
       ctx.lineWidth = 6;
       roundRect(ctx, x + 3, y + 3, w - 6, h - 6, 14);
@@ -401,7 +407,6 @@ export function card({ numeral, name, index }, reversed, { w = 250, h = 400 } = 
       const s = Math.min(w - 70, bottom - top - 10);
       ctx.save();
       ctx.translate(x + w / 2, (top + bottom) / 2);
-      if (reversed) ctx.rotate(Math.PI);
       ctx.strokeStyle = '#000';
       ctx.fillStyle = '#000';
       ctx.lineWidth = Math.max(4, s / 26);

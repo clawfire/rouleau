@@ -135,7 +135,7 @@ Conference, visitor or "HELLO my name is" badges. The strip is as wide as the pr
 A ticket that answers a question, with the answer *drawn* (all in Canvas 2D, black on white, thresholded):
 
 - **Magic 8-ball**: a black ball with its glare and its "8", the answer (Oui / Peut-être / Non + the sentence) in the round window. 17 answers.
-- **Tarot**: the 22 major arcana, printed as real cards (double frame, numeral, an emblem drawn for each arcanum, name band). One card or past · present · future; a reversed card has its emblem upside down, and its keywords are printed under it.
+- **Tarot**: the 22 major arcana, printed as real cards (double frame, numeral, an emblem drawn for each arcanum, name band). One card or past · present · future; a reversed card is printed upside down as a whole, and its keywords are printed under it, the right way up.
 - **Dice**: real dice. A d6 has its pips, the others are drawn as polyhedra (d4 triangle, d8 and d10 diamonds, d12 pentagon with facets, d20 hexagon, d100 as a d10 with two or three digits), 1 to 8 of them, with the total.
 - **Fortune cookie**: a broken cookie holding the paper slip with the fortune and six lucky numbers.
 
