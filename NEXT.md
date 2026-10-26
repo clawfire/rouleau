@@ -11,6 +11,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
     - *Bilan*: last (or chosen) Hevy workout, totals grid + PRs; formats *Court* (default, ~7 cm) and *Complet*
     - *Vierge*: no Hevy, N exercises × M sets with kg / reps / effort fields
   - **Spécimen de fonts** (`src/modules/specimen.js`)
+  - **L'oracle** (`src/modules/oracle.js`): 8-ball, tarot (major arcana), dice, fortune cookie; seeded draw + "Tirer à nouveau" button
   - **Badges** (`src/modules/badge.js` + `badge-draw.js`): conference / visitor / hello, 48 mm tall by 60–160 mm long, printed sideways; optional dithered photo and QR; flat preview via `turn()` in `main.js`
   - **QR utilitaires** (`src/modules/qr.js`, payloads + matrix in `src/services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
   - **Ticket du matin** (`src/modules/morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable
@@ -59,7 +60,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 
 1. ~~Ticket du matin~~ done (mini puzzle at the bottom still to add once the Jeux module exists)
 2. Tickets de tâches: GitHub/Jira issue → ticket with Octicons (MIT), mono font, QR to the issue
-3. Ticket de focus · L'oracle (quick wins)
+3. Ticket de focus (quick win) · ~~L'oracle~~ done (ideas: minor arcana, I Ching, "what do we eat?")
 4. Jeux: sudoku, Star Battle (Queens-like), Numberlink (Zip-like), unique solution via solver; patterns instead of colours
 5. ~~QR utilitaires~~ done · ~~Badges~~ done (still to do: CSV import to print a batch of badges, a lanyard-hole marker) (name, role, dithered photo, vCard QR, CSV import)
 6. Labo photo: brightness / contrast / gamma + dither choice, stickers & text, webcam photo-booth strip

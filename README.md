@@ -51,7 +51,8 @@ src/
 │   ├── specimen.js    # font specimen ticket
 │   ├── morning.js     # weather + agenda + priorities + quote
 │   ├── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
-│   └── badge.js       # sideways badges (+ badge-draw.js)
+│   ├── badge.js       # sideways badges (+ badge-draw.js)
+│   └── oracle.js      # 8-ball, tarot, dice, fortune cookie
 ├── ui/controls.js     # control schema → Web Awesome form components
 ├── fonts.js           # font registry (all SIL OFL)
 └── main.js            # app shell
@@ -128,6 +129,10 @@ Conference, visitor or "HELLO my name is" badges. The strip is as wide as the pr
 - **Hello**: "HELLO / my name is", the first name as big as it fits, or a dotted line to write it by hand when left empty.
 - Optional **photo** (shrunk in the browser, stays in localStorage, dithered at the size it is drawn so it stays 1-bit) and optional **QR code** (vCard of the person, a link, or text; it needs at least 3 dots per module, so a long vCard can be refused: lighten it).
 - The preview shows the badge **flat** and upright with the 4 mm unprintable bands along the long edges; switch *Aperçu à plat* off to see the ticket as it prints. The PNG and the print always use the printed (turned) orientation.
+
+### L'oracle
+
+A ticket that answers a question: **magic 8-ball** (17 answers, yes / maybe / no), **tarot** (22 major arcana, one card or past · present · future, upright or reversed), **dice** (1–8 dice, d4 to d100, with the total) and **fortune cookie** (a fortune and six lucky numbers). The draw is seeded: the preview and the print show the same answer until you press *Tirer à nouveau*.
 
 ### Spécimen de fonts
 
