@@ -25,8 +25,8 @@ import { adjust, dither, luminance, threshold } from './dither.js';
  * @param {number} [o.lineHeight=1.15]  multiple of the font's natural height
  * @param {number} [o.letterSpacing=0]  px
  * @param {number} [o.level=128]        threshold 0..255; higher = bolder
- * @param {boolean} [o.invert=false]    white text on a black band. ⚠️ Large solid areas print GREY
- *                                      on the T02 (the head limits energy per line): prefer `frame`.
+ * @param {boolean} [o.invert=false]    white text on a black band. Solid black at max density;
+ *                                      greyish at lower densities (sticker paper).
  * @param {boolean|number} [o.frame=false] outlined band; a number sets the border thickness (default 3)
  * @param {number} [o.padY=0]           vertical padding inside the band
  * @param {string} [o.transform]        'uppercase'

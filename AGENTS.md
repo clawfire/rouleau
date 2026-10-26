@@ -22,7 +22,7 @@
 - Text → threshold. Images and greys → dither. Never dither text.
 - Bitmaps are 1 byte per pixel, `1 = burn`. Packing to printer bytes happens only in `print/raster.js` (MSB first).
 - Keep everything 384 px wide; no horizontal inset by default (the printer has physical margins).
-- Typography: use `TYPE` from `src/fonts.js`. Text ≥ 18 px. Section headers are outlined (`frame`), never solid black (`invert` prints grey).
+- Typography: use `TYPE` from `src/fonts.js`. Text ≥ 18 px. Section headers are black bands (`invert`), solid at max density; `frame` for outlined bands.
 - Default dither: Atkinson. Checkboxes must be drawn, not typed.
 - ⌘P output is split into pages of max 297 mm (driver "Ticket 48 mm" size), cut on block boundaries (`engine/paginate.js`). Bluetooth and PNG are not limited.
 

@@ -51,8 +51,8 @@ export const TYPE = {
   mono: { family: 'Departure Mono', size: 22 },
   caption: { family: 'Departure Mono', size: 22 },
   title: { family: 'Archivo Black', size: 40, lineHeight: 1 },
-  /** Section header: outlined band (solid black bands print grey). */
-  section: { family: 'Archivo Black', size: 22, frame: true, transform: 'uppercase', align: 'center' },
+  /** Section header: black band, solid at max density (receipt paper). */
+  section: { family: 'Archivo Black', size: 22, invert: true, transform: 'uppercase', align: 'center' },
 };
 
 export const fontById = (id) => FONTS.find((f) => f.id === id) ?? FONTS[0];

@@ -91,7 +91,7 @@ Block builders: `text` (options include `frame` for outlined bands), `row` (key 
 | Fonts | Atkinson Hyperlegible (body), Departure Mono (mono, receipts, tickets), Archivo Black (titles, best symbols). All SIL OFL. |
 | Text size | 18 px minimum (≈ 2.3 mm). Bold doesn't bleed. Departure Mono: multiples of 11 px, so 22 px min. |
 | Dithering | Atkinson by default (pure whites). Bayer and threshold work well; Floyd–Steinberg never reaches pure white; halftone is meh. |
-| Solid black | Large black areas print **grey**: use outlined bands (`frame`), not `invert`. |
+| Solid black | Solid at max density (receipt paper); greyish at lower densities. `frame` gives an outlined band instead. |
 | Checkboxes | Glyphs are too small: draw them. |
 | Margins | The T02 is not borderless, so no side inset by default. |
 | Density | Receipt paper → max (4). Sticker paper → dark (3). Pick the paper in the app. |
