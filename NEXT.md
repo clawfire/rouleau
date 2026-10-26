@@ -11,6 +11,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
     - *Bilan*: last (or chosen) Hevy workout, totals grid + PRs; formats *Court* (default, ~7 cm) and *Complet*
     - *Vierge*: no Hevy, N exercises × M sets with kg / reps / effort fields
   - **Spécimen de fonts** (`src/modules/specimen.js`)
+  - **Ticket du matin** (`src/modules/morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable
 - UI: Web Awesome Pro, Brutalist theme. Preview shows 4 mm of paper on each side of the 48 mm print.
 
 ## Decisions from the paper test (see README "Print notes")
@@ -34,6 +35,8 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 
 ## Still untested
 
+- [ ] Ticket du matin with a real Google iCal address (parser checked on a synthetic feed: RRULE, EXDATE, RECURRENCE-ID override, CANCELLED, UTC, all-day; the `/gcal` proxy reaches Google)
+- [ ] Ticket du matin weather with the browser position (tested with a typed city only)
 - [ ] ⌘P multi-page output through the driver
 - [ ] `rep_range` sets (not present in the test data)
 
@@ -46,7 +49,7 @@ State of Rouleau when it moved from the cloud session to local Claude Code (26 O
 
 ## Next modules (roadmap, in the nav as "bientôt")
 
-1. Ticket du matin: weather, calendar (ICS), 3 priorities, quote, mini puzzle at the bottom
+1. ~~Ticket du matin~~ done (mini puzzle at the bottom still to add once the Jeux module exists)
 2. Tickets de tâches: GitHub/Jira issue → ticket with Octicons (MIT), mono font, QR to the issue
 3. Ticket de focus · L'oracle (quick wins)
 4. Jeux: sudoku, Star Battle (Queens-like), Numberlink (Zip-like), unique solution via solver; patterns instead of colours

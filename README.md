@@ -48,7 +48,8 @@ src/
 │   └── system.js      # ⌘P and PNG download
 ├── modules/
 │   ├── index.js       # registry (+ roadmap entries)
-│   └── specimen.js    # font specimen ticket
+│   ├── specimen.js    # font specimen ticket
+│   └── morning.js     # weather + agenda + priorities + quote
 ├── ui/controls.js     # control schema → Web Awesome form components
 ├── fonts.js           # font registry (all SIL OFL)
 └── main.js            # app shell
@@ -98,6 +99,14 @@ Three tickets:
 - Without a key, the preview uses a demo routine.
 - Run with `npm run dev`: Vite proxies `/hevy` to `api.hevyapp.com`, so the browser never hits CORS. A static build calls the API directly, which only works if Hevy allows the page's origin.
 - Set tags: `É` warm-up, `F` failure, `D` drop set.
+
+### Ticket du matin
+
+Date, then four sections you switch on or off: **weather**, **agenda**, **three priorities** (drawn checkboxes, empty ones become write-in lines) and a **quote** (of the day, or your own sentence). Optional first name for the greeting.
+
+- **Weather**: [Open-Meteo](https://open-meteo.com) (free, no key). Uses the browser position (allow it once, it is remembered for 6 h), or the city you type. Shows max / min, sky, rain chance, wind, 9h / 14h / 19h temperatures and sunrise / sunset.
+- **Agenda**: paste the *secret address in iCal format* of your Google Calendar (Calendar settings › Integrate calendar), one per line. No OAuth. Recurring events, exceptions, cancellations and time zones are handled by [ical.js](https://github.com/kewisch/ical.js). Optionally add tomorrow. Like Hevy, Google sends no CORS headers: `npm run dev` proxies `/gcal` to `calendar.google.com`. The secret address gives read access to your calendar, so it stays in your browser's localStorage only.
+- Without an iCal address, the preview shows a demo agenda.
 
 ### Spécimen de fonts
 

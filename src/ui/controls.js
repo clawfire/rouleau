@@ -84,6 +84,7 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
           values[c.key] = node.checked;
           emit();
         });
+        refreshOn(node, c, 'change');
         break;
       }
       case 'checkboxes': {

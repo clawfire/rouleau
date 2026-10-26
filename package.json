@@ -15,7 +15,8 @@
   "dependencies": {
     "@awesome.me/webawesome-pro": "^3.14.0",
     "@fontsource/archivo-black": "^5.3.0",
-    "@fontsource/atkinson-hyperlegible": "^5.3.0"
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "ical.js": "^2.2.1"
   },
   "private": true,
   "type": "module"
