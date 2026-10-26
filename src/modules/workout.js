@@ -135,10 +135,12 @@ export default {
   id: 'workout',
   label: 'Séance de sport',
   icon: 'dumbbell',
-  description: 'Avant : ta routine Hevy avec une case par série. Après : le bilan de ta dernière séance et tes records, à coller dans ton carnet.',
+  description: 'Avant : ta routine Hevy avec une case par série. Après : le bilan et tes records, à coller dans ton carnet. Ou une fiche vierge, sans Hevy.',
 
   defaults: {
     mode: 'plan',
+    blankExercises: 5,
+    blankSets: 3,
     apiKey: '',
     routineId: '',
     workoutId: '',
@@ -162,8 +164,22 @@ export default {
         options: [
           { value: 'plan', label: 'Séance à faire' },
           { value: 'recap', label: 'Bilan' },
+          { value: 'blank', label: 'Vierge' },
         ],
       },
+    ];
+
+    // Blank sheet: no Hevy needed.
+    if (v.mode === 'blank') {
+      schema.push(
+        { type: 'slider', key: 'blankExercises', label: "Nombre d'exercices", min: 1, max: 12, step: 1 },
+        { type: 'slider', key: 'blankSets', label: 'Séries par exercice', min: 1, max: 8, step: 1 },
+        { type: 'switch', key: 'notes', label: 'Zone notes + énergie' },
+      );
+      return schema;
+    }
+
+    schema.push(
       {
         type: 'text',
         key: 'apiKey',
@@ -172,7 +188,7 @@ export default {
         password: true,
         refresh: true,
       },
-    ];
+    );
 
     if (!v.apiKey) {
       schema.push({ type: 'callout', variant: 'neutral', text: "Sans clé, l'aperçu utilise des données de démo." });
@@ -245,6 +261,7 @@ export default {
   },
 
   build(v) {
+    if (v.mode === 'blank') return buildBlank(v);
     return v.mode === 'recap' ? buildRecap(v) : buildPlan(v);
   },
 };
@@ -315,6 +332,78 @@ async function buildPlan(v) {
       energyRow(),
     );
   }
+
+  blocks.push(
+    space(8),
+    text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
+    rule({ style: 'zigzag', thickness: 2 }),
+  );
+  return blocks;
+}
+
+/* ---------- "Vierge" (no Hevy) ---------- */
+
+/** Column layout of a blank set row, in dots: box | kg | reps | effort. */
+const BLANK_COLS = [
+  { label: 'kg', from: 40, to: 160 },
+  { label: 'reps', from: 176, to: 270 },
+  { label: 'effort', from: 286, to: 384 },
+];
+
+function buildBlank(v) {
+  const caption = `400 22px "${TYPE.caption.family}"`;
+  const strong = `700 22px "${TYPE.strong.family}"`;
+  const count = Number(v.blankExercises) || 5;
+  const sets = Number(v.blankSets) || 3;
+
+  const dotted = (ctx, from, to, y) => {
+    for (let x = from; x < to; x += 4) ctx.fillRect(x, y, 2, 2);
+  };
+
+  const blocks = [
+    text('Séance', TYPE.section),
+    space(10),
+    // "Date ......"
+    draw(30, (ctx, W) => {
+      ctx.font = caption;
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('Date', 0, 22);
+      dotted(ctx, 70, W, 24);
+    }, { fonts: [caption] }),
+    rule({ style: 'zigzag', thickness: 2 }),
+  ];
+
+  for (let i = 1; i <= count; i++) {
+    blocks.push(
+      space(6),
+      // "3. ...................." : exercise name to write
+      draw(34, (ctx, W) => {
+        ctx.font = strong;
+        ctx.textBaseline = 'alphabetic';
+        ctx.fillText(`${i}.`, 0, 26);
+        dotted(ctx, 34, W, 28);
+      }, { fonts: [strong] }),
+      // Column headers
+      draw(26, (ctx) => {
+        ctx.font = caption;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'alphabetic';
+        for (const c of BLANK_COLS) ctx.fillText(c.label, (c.from + c.to) / 2, 20);
+      }, { fonts: [caption] }),
+    );
+    for (let s = 0; s < sets; s++) {
+      blocks.push(
+        draw(36, (ctx) => {
+          ctx.lineWidth = 3;
+          ctx.strokeRect(1.5, 6.5, 21, 21);
+          for (const c of BLANK_COLS) dotted(ctx, c.from, c.to, 28);
+        }),
+      );
+    }
+    blocks.push(space(4), rule({ style: 'dashed', thickness: 2, margin: 6 }));
+  }
+
+  if (v.notes) blocks.push(space(6), text('Notes', TYPE.section), lines(3), space(10), energyRow());
 
   blocks.push(
     space(8),
