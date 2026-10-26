@@ -119,8 +119,8 @@ a.nav-item[aria-current='page'] wa-icon {
   margin-inline: auto;
   background: var(--paper);
   padding-block: var(--tooth);
-  /* The T02 leaves an unprintable 0.4 mm band on each side: show it. */
-  padding-inline: calc(var(--ticket-w) * 0.4 / 48);
+  /* The T02 leaves an unprintable 4 mm band on each side of the 48 mm print: show it. */
+  padding-inline: calc(var(--ticket-w) * 4 / 48);
   /* Torn top and bottom edges */
   mask:
     conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) bottom / var(--tooth) 51% repeat-x,
@@ -139,8 +139,8 @@ a.nav-item[aria-current='page'] wa-icon {
 }
 
 .paper[data-zoom='fit'] {
-  /* Fill the column, paper bands included (48.8 mm of paper for 48 mm of print). */
-  --ticket-w: min(768px, calc((100cqi - var(--wa-space-xl)) * 48 / 48.8));
+  /* Fill the column, paper bands included (56 mm of paper for 48 mm of print). */
+  --ticket-w: min(768px, calc((100cqi - var(--wa-space-xl)) * 48 / 56));
 }
 
 .paper[data-zoom='mm'] {
