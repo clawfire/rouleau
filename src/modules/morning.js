@@ -7,6 +7,7 @@ import { row, rule, space, text } from '../engine/blocks.js';
 import { TYPE } from '../fonts.js';
 import { CalendarError, agenda } from '../services/calendar.js';
 import { WeatherError, browserPosition, describe, forecast, geocode } from '../services/weather.js';
+import { puzzleBlocks } from './games.js';
 import { fontsReady, item, timeColumn, weatherHeadline } from './morning-draw.js';
 import { quoteOfTheDay } from './quotes.js';
 
@@ -46,6 +47,8 @@ export default {
     p3: '',
     quote: true,
     customQuote: '',
+    puzzle: 'none',
+    puzzleLevel: 'medium',
   },
 
   controls(v) {
@@ -92,6 +95,32 @@ export default {
     if (v.quote) {
       schema.push({ type: 'textarea', key: 'customQuote', label: 'Ta propre phrase', hint: 'Vide : une citation du jour.', rows: 2 });
     }
+
+    schema.push({
+      type: 'select',
+      key: 'puzzle',
+      label: 'Jeu du jour',
+      hint: 'Une grille à solution unique, la même toute la journée.',
+      refresh: true,
+      options: [
+        { value: 'none', label: 'Aucun' },
+        { value: 'sudoku', label: 'Sudoku' },
+        { value: 'stars', label: 'Star Battle' },
+        { value: 'link', label: 'Numberlink' },
+      ],
+    });
+    if (v.puzzle !== 'none') {
+      schema.push({
+        type: 'radio',
+        key: 'puzzleLevel',
+        label: 'Difficulté',
+        options: [
+          { value: 'easy', label: 'Facile' },
+          { value: 'medium', label: 'Moyen' },
+          { value: 'hard', label: 'Difficile' },
+        ],
+      });
+    }
     return schema;
   },
 
@@ -111,6 +140,7 @@ export default {
     if (v.agenda) blocks.push(...(await agendaSection(v, now)));
     if (v.priorities) blocks.push(...prioritiesSection(v));
     if (v.quote) blocks.push(...quoteSection(v, now));
+    if (v.puzzle !== 'none') blocks.push(space(6), ...(await puzzleSection(v, now)));
 
     blocks.push(space(8), text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }), rule({ style: 'zigzag', thickness: 2 }));
     return blocks;
@@ -186,3 +216,16 @@ function quoteSection(v, now) {
     ...(q.by ? [space(2), text(`— ${q.by}`, { ...TYPE.caption, align: 'center' })] : []),
   ];
 }
+
+/** Grid size per difficulty for the games that have one. */
+const PUZZLE_SIZES = { easy: { starsSize: 5, linkSize: 5 }, medium: { starsSize: 6, linkSize: 6 }, hard: { starsSize: 8, linkSize: 7 } };
+
+/** Seeded by the date: the same grid all day, a new one tomorrow. */
+const puzzleSection = (v, now) =>
+  puzzleBlocks({
+    game: v.puzzle,
+    level: v.puzzleLevel,
+    ...PUZZLE_SIZES[v.puzzleLevel],
+    seed: now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate(),
+    solution: false,
+  });

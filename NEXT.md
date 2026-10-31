@@ -8,7 +8,7 @@ State of Rouleau on 26 Oct 2026 (after the first local Claude Code session).
 - Live: https://rouleau-t02.netlify.app (Netlify team `clawfire`, auto-deploy on every push to `main`).
 - Modules done (nav order):
   - **Séance de sport** (`workout.js`): *à faire* (Hevy routine, drawn checkbox per set), *Bilan* (totals + PRs, *Court* / *Complet*), *Vierge*
-  - **Ticket du matin** (`morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable
+  - **Ticket du matin** (`morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable; optional puzzle of the day at the bottom (`puzzleBlocks()` from `games.js`, seeded by the date)
   - **Bullet journal** (`bujo.js`): habit tracker (month / week), week Mon → Sun with 3 lines a day, daily log, key; grid step adjustable (5 mm = Leuchtturm dot grid)
   - **Ticket de focus** (`focus.js`): task, definition of done, 5-minute squares or pomodoros, steps, parking lot
   - **QR utilitaires** (`qr.js`, payloads + matrix in `services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
@@ -109,8 +109,6 @@ Chosen over a Netlify Form: no captcha or Google script, nothing stored by us, a
 - Badges: CSV import to print a batch on one strip, a lanyard-hole marker.
 - Bullet journal: year in pixels / mood strip, collection index labels, dot-grid ruler strip.
 - Oracle: minor arcana, I Ching, "what do we eat?".
-
-- Morning ticket: the mini puzzle at the bottom (use `puzzleBlocks()` from `games.js`).
 
 ## Next modules (roadmap, in the nav as "bientôt")
 
