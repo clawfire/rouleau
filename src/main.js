@@ -387,7 +387,11 @@ const fileName = () => {
   return `rouleau-${state.module.id}-${stamp}.png`;
 };
 
-$('#btn-png').addEventListener('click', () => state.bitmap && downloadPNG(state.bitmap, fileName()));
+$('#btn-png').addEventListener('click', async () => {
+  if (!state.bitmap) return;
+  await downloadPNG(state.bitmap, fileName());
+  offerCoffee();
+});
 
 $('#btn-system').addEventListener('click', async () => {
   if (!state.bitmap) return;
