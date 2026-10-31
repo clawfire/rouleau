@@ -9,7 +9,8 @@ Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://we
 ```bash
 cp .npmrc.example .npmrc   # Web Awesome Pro token, see below
 npm install
-npm run dev        # http://localhost:5173
+npm run dev        # netlify dev: http://localhost:8888, with the /hevy and /gcal rewrites of netlify.toml
+npm run dev:vite   # plain Vite on http://localhost:5173 (its own proxy for /hevy and /gcal)
 npm run build      # static site in dist/, deployable anywhere
 ```
 
@@ -102,7 +103,7 @@ Three tickets:
 
 - Paste your Hevy API key (Hevy Pro › Settings › Developer). It stays in your browser's localStorage.
 - Without a key, the preview uses a demo routine.
-- Run with `npm run dev`: Vite proxies `/hevy` to `api.hevyapp.com`, so the browser never hits CORS. A static build calls the API directly, which only works if Hevy allows the page's origin.
+- Run with `npm run dev` (needs the [Netlify CLI](https://docs.netlify.com/cli/get-started/)): the Netlify rewrite proxies `/hevy` to `api.hevyapp.com`, so the browser never hits CORS. A static build calls the API directly, which only works if Hevy allows the page's origin.
 - Set tags: `É` warm-up, `F` failure, `D` drop set.
 
 ### Ticket du matin
@@ -110,7 +111,7 @@ Three tickets:
 Date, then four sections you switch on or off: **weather**, **agenda**, **three priorities** (drawn checkboxes, empty ones become write-in lines) and a **quote** (of the day, or your own sentence). Optional first name for the greeting.
 
 - **Weather**: [Open-Meteo](https://open-meteo.com) (free, no key). Uses the browser position (allow it once, it is remembered for 6 h), or the city you type. Shows max / min, sky, rain chance, wind, 9h / 14h / 19h temperatures and sunrise / sunset.
-- **Agenda**: paste the *secret address in iCal format* of your Google Calendar (Calendar settings › Integrate calendar), one per line. No OAuth. Recurring events, exceptions, cancellations and time zones are handled by [ical.js](https://github.com/kewisch/ical.js). Optionally add tomorrow. Like Hevy, Google sends no CORS headers: `npm run dev` proxies `/gcal` to `calendar.google.com`. The secret address gives read access to your calendar, so it stays in your browser's localStorage only.
+- **Agenda**: paste the *secret address in iCal format* of your Google Calendar (Calendar settings › Integrate calendar), one per line. No OAuth. Recurring events, exceptions, cancellations and time zones are handled by [ical.js](https://github.com/kewisch/ical.js). Optionally add tomorrow. Like Hevy, Google sends no CORS headers: `npm run dev` rewrites `/gcal` to `calendar.google.com`. The secret address gives read access to your calendar, so it stays in your browser's localStorage only.
 - Without an iCal address, the preview shows a demo agenda.
 
 ### QR utilitaires

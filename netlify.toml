@@ -11,6 +11,12 @@
   # Use the /hevy and /gcal rewrites below instead of calling the APIs from the browser (CORS).
   VITE_USE_PROXY = "1"
 
+# `npm run dev` (netlify dev): Vite on 5173, served with the redirects below on http://localhost:8888.
+[dev]
+  command = "vite --port 5173 --strictPort"
+  targetPort = 5173
+  autoLaunch = false
+
 # Same role as the Vite dev proxy: Hevy and Google Calendar send no CORS headers.
 [[redirects]]
   from = "/hevy/*"

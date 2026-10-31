@@ -3,9 +3,9 @@
  * or any other .ics URL). Recurring events, exceptions and time zones are
  * expanded with ical.js.
  *
- * In dev, calendar.google.com goes through Vite's proxy (`/gcal`, see
- * vite.config.js) because Google sends no CORS headers; on Netlify a rewrite in
- * netlify.toml does the same (VITE_USE_PROXY). In a static build the
+ * In dev, calendar.google.com goes through `/gcal` (netlify.toml rewrite under
+ * `netlify dev`, vite.config.js proxy under plain Vite) because Google sends no CORS
+ * headers; deployed on Netlify the same rewrite applies (VITE_USE_PROXY). In a static build the
  * feed is fetched directly, which only works for hosts that allow the origin.
  */
 import ICAL from 'ical.js';
