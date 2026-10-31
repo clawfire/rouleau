@@ -91,11 +91,6 @@ export default {
       );
     }
 
-    schema.push({ type: 'switch', key: 'quote', label: 'Citation', refresh: true });
-    if (v.quote) {
-      schema.push({ type: 'textarea', key: 'customQuote', label: 'Ta propre phrase', hint: 'Vide : une citation du jour.', rows: 2 });
-    }
-
     schema.push({
       type: 'select',
       key: 'puzzle',
@@ -121,6 +116,11 @@ export default {
         ],
       });
     }
+
+    schema.push({ type: 'switch', key: 'quote', label: 'Citation', refresh: true });
+    if (v.quote) {
+      schema.push({ type: 'textarea', key: 'customQuote', label: 'Ta propre phrase', hint: 'Vide : une citation du jour.', rows: 2 });
+    }
     return schema;
   },
 
@@ -139,8 +139,8 @@ export default {
     if (v.weather) blocks.push(...(await weatherSection(v)));
     if (v.agenda) blocks.push(...(await agendaSection(v, now)));
     if (v.priorities) blocks.push(...prioritiesSection(v));
-    if (v.quote) blocks.push(...quoteSection(v, now));
     if (v.puzzle !== 'none') blocks.push(space(6), ...(await puzzleSection(v, now)));
+    if (v.quote) blocks.push(...quoteSection(v, now));
 
     blocks.push(space(8), text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }), rule({ style: 'zigzag', thickness: 2 }));
     return blocks;
