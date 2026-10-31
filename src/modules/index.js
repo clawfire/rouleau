@@ -27,8 +27,8 @@ import { PARTS } from './registry.js';
 const part = (id) => PARTS.find((m) => m.id === id);
 
 export const MODULES = [
-  part('workout'),
   morning,
+  part('workout'),
   part('bujo'),
   part('focus'),
   part('qr'),
