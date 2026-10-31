@@ -24,6 +24,7 @@ import '@awesome.me/webawesome-pro/dist/components/radio/radio.js';
 import '@awesome.me/webawesome-pro/dist/components/select/select.js';
 import '@awesome.me/webawesome-pro/dist/components/file-input/file-input.js';
 import '@awesome.me/webawesome-pro/dist/components/details/details.js';
+import '@awesome.me/webawesome-pro/dist/components/dialog/dialog.js';
 import '@awesome.me/webawesome-pro/dist/components/option/option.js';
 import './fonts.js';
 import './styles.css';
@@ -35,7 +36,10 @@ import { MODULES, PAGES, buildTicket, moduleById } from './modules/index.js';
 import { T02Bluetooth, isBluetoothAvailable } from './print/bluetooth.js';
 import { downloadPNG, systemPrint } from './print/system.js';
 import { renderAbout } from './ui/about.js';
+import { applyLayers } from './engine/layers.js';
 import { renderControls } from './ui/controls.js';
+import { createEditor } from './ui/editor.js';
+import { select as selectLayer } from './ui/studio.js';
 import { store } from './store.js';
 
 /* ---------- Small helpers ---------- */
@@ -149,6 +153,17 @@ function showPage(page) {
   renderNav();
 }
 
+/** Values a module flags `transient` (a photo…) live for the session only: never written to localStorage. */
+const sessionStash = {};
+function persist(mod, values) {
+  const rest = { ...values };
+  for (const key of mod.transient ?? []) {
+    (sessionStash[mod.id] ??= {})[key] = rest[key];
+    delete rest[key];
+  }
+  store.set(`module:${mod.id}`, rest);
+}
+
 function selectModule(id) {
   const page = PAGES.find((p) => p.id === id);
   if (page) return showPage(page);
@@ -158,7 +173,8 @@ function selectModule(id) {
   $('#print-actions').hidden = false;
   const mod = moduleById(id);
   state.module = mod;
-  state.values = store.get(`module:${mod.id}`, mod.defaults);
+  state.values = { ...store.get(`module:${mod.id}`, mod.defaults), ...sessionStash[mod.id] };
+  selectLayer(null);
   $('#module-title').textContent = mod.label;
   $('#module-description').textContent = mod.description ?? '';
   $('#current-module-mobile').textContent = mod.label;
@@ -179,11 +195,27 @@ async function renderModuleControls() {
     mod.panel(container, {
       values: state.values,
       onChange: (values) => {
-        store.set(`module:${mod.id}`, values);
+        persist(mod, values);
         scheduleRender();
       },
     });
     return;
+  }
+  // Modules can add first-level cards before "Réglages": `source` (the photo) and `layersCard` (text, stickers).
+  const rerender = () => {
+    renderModuleControls();
+    scheduleRender();
+  };
+  for (const [key, id] of [['source', 'source'], ['layersCard', 'layers']]) {
+    const def = mod[key];
+    $(`#module-${id}-card`).hidden = !def;
+    if (!def) continue;
+    $(`#module-${id}-title`).textContent = def.title;
+    $(`#module-${id}-icon`).setAttribute('name', def.icon ?? 'image');
+    renderControls($(`#module-${id}`), def.controls(state.values), state.values, (values) => {
+      persist(mod, values);
+      scheduleRender();
+    }, rerender);
   }
   let schema = mod.controls ?? [];
   if (typeof schema === 'function') {
@@ -200,7 +232,7 @@ async function renderModuleControls() {
     schema,
     state.values,
     (values) => {
-      store.set(`module:${mod.id}`, values);
+      persist(mod, values);
       scheduleRender();
     },
     () => {
@@ -219,9 +251,12 @@ async function render() {
   try {
     const blocks = await buildTicket(state.module, state.values);
     const bitmap = await renderTicket(blocks);
+    // Free layers (text, stickers) are burnt into the bitmap itself, so print, PNG and ⌘P include them.
+    if (state.module.layers) await applyLayers(bitmap, state.module.layers(state.values));
     if (id !== state.renderId) return; // a newer render started meanwhile
     state.bitmap = bitmap;
     showPreview(bitmap, state.module.turn?.(state.values));
+    editor.sync();
     updateMeta(bitmap);
   } catch (err) {
     console.error(err);
@@ -260,6 +295,35 @@ function showPreview(bitmap, turn) {
 }
 
 const scheduleRender = debounce(render, 120);
+
+/** Re-render as fast as renders finish (dragging on the preview): never queue more than one behind. */
+let live = { busy: false, again: false };
+function liveRender() {
+  if (live.busy) {
+    live.again = true;
+    return;
+  }
+  live.busy = true;
+  render().finally(() => {
+    live.busy = false;
+    if (live.again) {
+      live.again = false;
+      liveRender();
+    }
+  });
+}
+
+const editor = createEditor({
+  canvas: $('#ticket'),
+  overlay: $('#ticket-overlay'),
+  module: () => state.module,
+  values: () => state.values,
+  onChange: () => {
+    persist(state.module, state.values);
+    liveRender();
+  },
+  onCommit: () => renderModuleControls(), // sliders follow what was dragged
+});
 
 function updateMeta(bitmap) {
   const mm = dotsToMm(bitmap.height);
@@ -358,6 +422,22 @@ zoom.addEventListener('change', () => {
   $('#paper').dataset.zoom = zoom.value;
   store.set('ui', { zoom: zoom.value });
 });
+
+/* ---------- Collapsible panels ---------- */
+
+const panels = store.get('panels', { closed: [] });
+for (const panel of document.querySelectorAll('wa-details.panel')) {
+  panel.open = !panels.closed.includes(panel.dataset.panel);
+  const remember = () => {
+    const closed = new Set(panels.closed);
+    if (panel.open) closed.delete(panel.dataset.panel);
+    else closed.add(panel.dataset.panel);
+    panels.closed = [...closed];
+    store.set('panels', panels);
+  };
+  panel.addEventListener('wa-after-show', (e) => e.target === panel && remember());
+  panel.addEventListener('wa-after-hide', (e) => e.target === panel && remember());
+}
 
 /* ---------- Boot ---------- */
 

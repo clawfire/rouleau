@@ -33,6 +33,7 @@ export const MODULES = [
   part('focus'),
   part('qr'),
   part('badge'),
+  part('photo'),
   part('oracle'),
   part('games'),
   part('weather'),
@@ -40,7 +41,6 @@ export const MODULES = [
   part('priorities'),
   part('quote'),
   part('specimen'),
-  { id: 'photo', label: 'Labo photo', icon: 'camera-retro', soon: true },
   { id: 'tasks', label: 'Tickets de tâches', icon: 'list-check', soon: true },
 ];
 

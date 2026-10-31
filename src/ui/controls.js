@@ -1,7 +1,7 @@
 /**
  * Schema → Web Awesome form controls.
  *
- * Supported types: text, textarea, slider, switch, checkboxes, radio, select, image, button, callout.
+ * Supported types: text, textarea, slider, switch, checkboxes, radio, select, image, button, buttons (a row of buttons), callout, custom (a module-owned widget), section (a titled card grouping the controls after it).
  * Every control writes into `values[key]` and calls `onChange(values)`.
  * Controls flagged `refresh: true` also call `onRefresh(values)` when committed,
  * so a module can rebuild its controls (e.g. load routines once an API key is set).
@@ -50,9 +50,19 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
     if (c.refresh && onRefresh) node.addEventListener(event, () => onRefresh(values));
   };
 
+  let group = null; // the card opened by the last `section`: later controls go inside it
   for (const c of schema) {
     let node;
     switch (c.type) {
+      case 'section': {
+        // A titled card that groups the controls following it, up to the next section.
+        group = el('wa-card', { appearance: 'outlined' }, [el('div', { slot: 'header', class: 'wa-heading-s' }, [c.title])]);
+        const body = el('div', { class: 'wa-stack wa-gap-m' });
+        group.append(body);
+        group.body = body;
+        container.append(group);
+        continue;
+      }
       case 'text': {
         node = el('wa-input', {
           label: c.label,
@@ -172,6 +182,26 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
         });
         break;
       }
+      case 'buttons': {
+        // Several buttons on one line (they wrap when the panel is narrow): `buttons: [{ label, onClick }]`.
+        node = el('div', { class: 'wa-cluster wa-gap-xs' });
+        for (const b of c.buttons) {
+          const btn = el('wa-button', { size: 's', appearance: 'outlined', variant: b.variant ?? 'neutral' }, [b.label]);
+          btn.addEventListener('click', () => {
+            b.onClick?.(values);
+            emit();
+            if (c.refresh && onRefresh) onRefresh(values);
+          });
+          node.append(btn);
+        }
+        break;
+      }
+      case 'custom': {
+        // A module-owned widget: `render(container, values, emit, refresh)` fills a host element.
+        node = el('div', { class: 'wa-stack wa-gap-m' });
+        c.render(node, values, emit, () => onRefresh?.(values));
+        break;
+      }
       case 'callout': {
         const icon = el('wa-icon', {
           slot: 'icon',
@@ -184,6 +214,6 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
         console.warn('[rouleau] unknown control type', c);
         continue;
     }
-    container.append(node);
+    (group?.body ?? container).append(node);
   }
 }

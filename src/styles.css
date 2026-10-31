@@ -323,3 +323,77 @@ a.nav-item[aria-current='page'] wa-icon {
   margin: 0;
   color: var(--wa-color-text-quiet);
 }
+
+/* ---------- Photo editor (on top of the preview) ---------- */
+
+.ticket-stage {
+  position: relative;
+  line-height: 0;
+}
+
+.ticket-overlay {
+  position: absolute;
+  inset: 0;
+  touch-action: none; /* the gesture is ours: drag, pinch */
+  cursor: grab;
+  user-select: none;
+}
+
+.ticket-overlay:active {
+  cursor: grabbing;
+}
+
+.sel {
+  position: absolute;
+  box-sizing: border-box;
+  outline: var(--wa-border-width-m) dashed var(--wa-color-brand-fill-loud);
+  outline-offset: var(--wa-space-3xs);
+  pointer-events: none; /* only the handles catch the pointer */
+}
+
+.sel > span {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  inline-size: var(--wa-space-xl);
+  block-size: var(--wa-space-xl);
+  background: var(--wa-color-brand-fill-loud);
+  color: var(--wa-color-brand-on-loud);
+  border-radius: var(--wa-border-radius-pill);
+  font-size: var(--wa-font-size-xs);
+  line-height: 1;
+  pointer-events: auto;
+}
+
+.sel-size {
+  inset-block-end: calc(var(--wa-space-xl) / -2);
+  inset-inline-end: calc(var(--wa-space-xl) / -2);
+  cursor: nwse-resize;
+}
+
+.sel-del {
+  inset-block-start: calc(var(--wa-space-xl) / -2);
+  inset-inline-start: calc(var(--wa-space-xl) / -2);
+  cursor: pointer;
+}
+
+.sel-knob {
+  inset-block-start: calc(var(--wa-space-2xl) * -1.4);
+  inset-inline-start: calc(50% - var(--wa-space-xl) / 2);
+  cursor: crosshair;
+}
+
+.sel > .sel-stem {
+  inset-block-start: calc(var(--wa-space-2xl) * -1.4 + var(--wa-space-xl));
+  inset-inline-start: calc(50% - 1px);
+  inline-size: 2px;
+  block-size: calc(var(--wa-space-2xl) * 1.4 - var(--wa-space-xl));
+  border-radius: 0;
+  pointer-events: none;
+}
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(4rem, 1fr));
+  gap: var(--wa-space-2xs);
+}

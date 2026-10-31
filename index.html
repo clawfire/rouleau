@@ -58,19 +58,35 @@
             <p id="module-description" class="wa-body-s wa-color-text-quiet"></p>
           </div>
 
-          <wa-card>
-            <div slot="header" class="wa-cluster wa-gap-xs">
+          <wa-details id="module-source-card" class="panel" appearance="outlined" open hidden data-panel="source">
+            <span slot="summary" class="wa-cluster wa-gap-xs">
+              <wa-icon id="module-source-icon" name="image"></wa-icon>
+              <strong id="module-source-title">Source</strong>
+            </span>
+            <div id="module-source" class="wa-stack wa-gap-l"></div>
+          </wa-details>
+
+          <wa-details id="module-layers-card" class="panel" appearance="outlined" open hidden data-panel="layers">
+            <span slot="summary" class="wa-cluster wa-gap-xs">
+              <wa-icon id="module-layers-icon" name="layer-group"></wa-icon>
+              <strong id="module-layers-title">Calques</strong>
+            </span>
+            <div id="module-layers" class="wa-stack wa-gap-l"></div>
+          </wa-details>
+
+          <wa-details class="panel" appearance="outlined" open data-panel="settings">
+            <span slot="summary" class="wa-cluster wa-gap-xs">
               <wa-icon name="sliders"></wa-icon>
               <strong>Réglages</strong>
-            </div>
+            </span>
             <div id="module-controls" class="wa-stack wa-gap-l"></div>
-          </wa-card>
+          </wa-details>
 
-          <wa-card>
-            <div slot="header" class="wa-cluster wa-gap-xs">
+          <wa-details class="panel" appearance="outlined" open data-panel="print">
+            <span slot="summary" class="wa-cluster wa-gap-xs">
               <wa-icon name="print"></wa-icon>
               <strong>Impression</strong>
-            </div>
+            </span>
             <div id="print-controls" class="wa-stack wa-gap-l"></div>
             <wa-callout id="ble-callout" variant="neutral" size="s" class="ble-callout">
               <wa-icon slot="icon" name="circle-info"></wa-icon>
@@ -78,7 +94,7 @@
                 Bluetooth direct depuis Chrome ou Edge. Si le bridge macOS garde la T02 connectée, le navigateur ne la verra pas : utilise alors ⌘P.
               </span>
             </wa-callout>
-          </wa-card>
+          </wa-details>
         </section>
 
         <section class="wa-stack wa-gap-m preview-col" aria-label="Aperçu du ticket">
@@ -93,7 +109,10 @@
           <div class="paper-wrap">
             <div class="paper-shadow">
               <div class="paper" id="paper" data-zoom="fit">
-                <canvas id="ticket" aria-label="Aperçu du ticket" role="img"></canvas>
+                <div class="ticket-stage">
+                  <canvas id="ticket" aria-label="Aperçu du ticket" role="img"></canvas>
+                  <div id="ticket-overlay" class="ticket-overlay" hidden></div>
+                </div>
               </div>
             </div>
             <wa-spinner id="rendering" class="rendering" hidden></wa-spinner>

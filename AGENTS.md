@@ -25,8 +25,9 @@
 - Typography: use `TYPE` from `src/fonts.js`. Text ≥ 18 px. Section headers are black bands (`invert`), solid at max density; `frame` for outlined bands.
 - Default dither: Atkinson. Checkboxes must be drawn, not typed.
 - Modules return `blocks(values)` (the ticket without its signature); `buildTicket()` in `modules/index.js` adds the shared footer. The morning ticket stacks the `blocks` of any module not flagged `composable: false` (QR, badges and dev tools are). Its composition is saved per user (`sections` in `rouleau:module:morning`, shape and legacy migration in `modules/morning-model.js`).
+- Editable modules (photo lab) set `editable: true` with `layers(values)` (text/sticker layers burnt into the bitmap by `engine/layers.js` after `renderTicket`) and `targets(values)` (photo rectangles to pan/zoom); `ui/editor.js` drives them on the preview. `transient: [keys]` values (photos) never reach localStorage. Stickers are Font Awesome free icons fetched from FA's CDN (`engine/icons.js`). Modules can add first-level cards with `source` / `layersCard`.
 - ⌘P output is split into pages of max 297 mm (driver "Ticket 48 mm" size), cut on block boundaries (`engine/paginate.js`). Bluetooth and PNG are not limited.
 
 ## Roadmap (nav entries flagged `soon`)
 
-Photo lab · Task tickets (GitHub/Jira, Octicons MIT). Done: Workout (Hevy), Morning ticket, QR utilities, Badges, Oracle, Bullet journal, Focus ticket, Games (sudoku, Star Battle, Numberlink; unique solutions checked by pure solvers in `games-*.js`).
+Task tickets (GitHub/Jira, Octicons MIT). Done: Photo lab (session-only photo, `transient` in `main.js`), Workout (Hevy), Morning ticket, QR utilities, Badges, Oracle, Bullet journal, Focus ticket, Games (sudoku, Star Battle, Numberlink; unique solutions checked by pure solvers in `games-*.js`).

@@ -16,6 +16,8 @@ export const DITHERS = [
   { id: 'threshold', label: 'Seuil', hint: 'Noir ou blanc, sans nuance' },
   { id: 'floyd', label: 'Floyd–Steinberg', hint: 'Doux, mais jamais blanc pur' },
   { id: 'halftone', label: 'Halftone', hint: 'Points de trame, moyen sur T02' },
+  { id: 'stucki', label: 'Stucki', hint: 'Diffusion large, très doux et net' },
+  { id: 'screen', label: 'Trame inclinée', hint: 'Points de trame avec angle réglable' },
 ];
 
 const clamp = (v) => (v < 0 ? 0 : v > 255 ? 255 : v);
@@ -99,6 +101,54 @@ export function atkinson(lum, width, height) {
   return out;
 }
 
+/** Stucki: wide error diffusion (12 neighbours), smoother than Floyd with fewer worms. */
+export function stucki(lum, width, height) {
+  const buf = Float32Array.from(lum);
+  const out = new Uint8Array(width * height);
+  const kernel = [
+    [1, 0, 8], [2, 0, 4],
+    [-2, 1, 2], [-1, 1, 4], [0, 1, 8], [1, 1, 4], [2, 1, 2],
+    [-2, 2, 1], [-1, 2, 2], [0, 2, 4], [1, 2, 2], [2, 2, 1],
+  ];
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const idx = y * width + x;
+      const old = buf[idx];
+      const val = old < 128 ? 0 : 255;
+      out[idx] = val === 0 ? 1 : 0;
+      const err = (old - val) / 42;
+      for (const [dx, dy, w] of kernel) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx >= 0 && nx < width && ny < height) buf[ny * width + nx] += err * w;
+      }
+    }
+  }
+  return out;
+}
+
+/**
+ * Amplitude-modulated screen at any angle: a cosine spot function on a rotated grid,
+ * so dots grow from the cell centres as the tone darkens. `cell` in dots, `angle` in degrees.
+ */
+export function screen(lum, width, height, cell = 6, angle = 45) {
+  const out = new Uint8Array(width * height);
+  const a = (angle * Math.PI) / 180;
+  const cos = Math.cos(a);
+  const sin = Math.sin(a);
+  const k = (Math.PI * 2) / Math.max(2, cell);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const u = (x * cos + y * sin) * k;
+      const v = (-x * sin + y * cos) * k;
+      const spot = (Math.cos(u) + Math.cos(v)) / 4 + 0.5; // 1 at the dot centre, 0 between dots
+      const darkness = 1 - lum[y * width + x] / 255;
+      out[y * width + x] = darkness > 1 - spot ? 1 : 0;
+    }
+  }
+  return out;
+}
+
 const BAYER8 = (() => {
   // Classic recursive construction of the 8×8 Bayer matrix.
   let m = [[0]];
@@ -166,7 +216,7 @@ export function halftone(lum, width, height, cell = 6) {
 /**
  * Dispatch by algorithm id.
  * @param {string} algo one of DITHERS[].id
- * @param {{ level?: number, cell?: number }} [opts]
+ * @param {{ level?: number, cell?: number, angle?: number }} [opts]
  */
 export function dither(lum, width, height, algo = 'atkinson', opts = {}) {
   switch (algo) {
@@ -178,6 +228,10 @@ export function dither(lum, width, height, algo = 'atkinson', opts = {}) {
       return halftone(lum, width, height, opts.cell ?? 6);
     case 'threshold':
       return threshold(lum, width, height, opts.level ?? 128);
+    case 'stucki':
+      return stucki(lum, width, height);
+    case 'screen':
+      return screen(lum, width, height, opts.cell ?? 6, opts.angle ?? 45);
     case 'atkinson':
     default:
       return atkinson(lum, width, height);
