@@ -17,6 +17,7 @@ import specimen from './specimen.js';
 import badge from './badge.js';
 import bujo from './bujo.js';
 import focus from './focus.js';
+import games from './games.js';
 import morning from './morning.js';
 import oracle from './oracle.js';
 import qr from './qr.js';
@@ -30,10 +31,10 @@ export const MODULES = [
   qr,
   badge,
   oracle,
+  games,
   specimen,
   { id: 'photo', label: 'Labo photo', icon: 'camera-retro', soon: true },
   { id: 'tasks', label: 'Tickets de tâches', icon: 'list-check', soon: true },
-  { id: 'games', label: 'Jeux', icon: 'puzzle-piece', soon: true },
 ];
 
 /** Pages of the menu that are not modules (nothing to print, no controls, no preview). */

@@ -14,6 +14,7 @@ State of Rouleau on 26 Oct 2026 (after the first local Claude Code session).
   - **QR utilitaires** (`qr.js`, payloads + matrix in `services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
   - **Badges** (`badge.js` + `badge-draw.js`): conference / visitor / hello, 48 mm tall by 60–160 mm long; optional dithered photo and QR
   - **L'oracle** (`oracle.js` + `oracle-draw.js`): 8-ball, tarot (22 drawn cards, reversed = whole card upside down), dice, fortune cookie; seeded draw
+  - **Jeux** (`games.js` + `games-draw.js`; pure generators/solvers `games-sudoku.js`, `games-stars.js`, `games-link.js`): sudoku (3 levels), Star Battle 5–9, Numberlink 5–7 (every cell filled). Unique solution checked while generating; seeded; optional answer printed small and upside down. Star Battle 10+ and Numberlink 8+ are too slow to generate in the browser.
   - **Spécimen de fonts** (`specimen.js`), under the collapsed "Développeurs" menu (`group: 'dev'`)
 - Pages that are not modules (`PAGES` in `modules/index.js`, `showPage()` in `main.js`): **Et plus encore** (`ui/about.js`): why Rouleau exists, the macOS driver, the suggestion link, what leaves the browser, credits. The menu footer always shows "Fait par Thibault Milan" (thibaultmilan.com) and a link to the repo.
 - UI: Web Awesome Pro, Brutalist theme. Preview shows 4 mm of paper on each side of the 48 mm print.
@@ -108,13 +109,13 @@ Chosen over a Netlify Form: no captcha or Google script, nothing stored by us, a
 - Badges: CSV import to print a batch on one strip, a lanyard-hole marker.
 - Bullet journal: year in pixels / mood strip, collection index labels, dot-grid ruler strip.
 - Oracle: minor arcana, I Ching, "what do we eat?".
-- Morning ticket: the mini puzzle at the bottom, once the Jeux module exists.
+
+- Morning ticket: the mini puzzle at the bottom (use `puzzleBlocks()` from `games.js`).
 
 ## Next modules (roadmap, in the nav as "bientôt")
 
 1. Tickets de tâches: GitHub/Jira issue → ticket with Octicons (MIT), mono font, QR to the issue (reuses `qr-payload.js`)
-2. Jeux: sudoku, Star Battle (Queens-like), Numberlink (Zip-like), unique solution via solver; patterns instead of colours
-3. Labo photo: brightness / contrast / gamma + dither choice, stickers & text, webcam photo-booth strip
+2. Labo photo: brightness / contrast / gamma + dither choice, stickers & text, webcam photo-booth strip
 
 ## Setup reminder
 

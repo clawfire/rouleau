@@ -28,4 +28,4 @@
 
 ## Roadmap (nav entries flagged `soon`)
 
-Photo lab · Task tickets (GitHub/Jira, Octicons MIT) · Puzzles (sudoku, Star Battle, Numberlink — unique solutions via solver). Done: Workout (Hevy), Morning ticket, QR utilities, Badges, Oracle, Bullet journal, Focus ticket.
+Photo lab · Task tickets (GitHub/Jira, Octicons MIT). Done: Workout (Hevy), Morning ticket, QR utilities, Badges, Oracle, Bullet journal, Focus ticket, Games (sudoku, Star Battle, Numberlink; unique solutions checked by pure solvers in `games-*.js`).

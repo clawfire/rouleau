@@ -3,34 +3,12 @@
  * The draw is seeded: the preview and the print show the same answer until you press "Tirer".
  */
 import { row, rule, space, text } from '../engine/blocks.js';
+import { prng, shuffle } from '../engine/rng.js';
 import { TYPE } from '../fonts.js';
 import { FONTS as DRAW_FONTS, ball, card, cookie, dice } from './oracle-draw.js';
 
-/* ---------- Seeded randomness ---------- */
-
-/** mulberry32: tiny, good enough, reproducible. */
-function prng(seed) {
-  let a = Number(seed) >>> 0;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
 const pick = (rand, list) => list[Math.floor(rand() * list.length)];
 const int = (rand, min, max) => min + Math.floor(rand() * (max - min + 1));
-
-function shuffle(rand, list) {
-  const a = [...list];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(rand() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
 
 /* ---------- Content ---------- */
 
