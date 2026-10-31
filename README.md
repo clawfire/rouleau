@@ -53,7 +53,7 @@ src/
 │   ├── morning.js     # weather + agenda + priorities + quote
 │   ├── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
 │   ├── bujo.js        # bullet journal: habit tracker, week, day, key
-│   ├── focus.js       # focus ticket: timebox, steps, parking lot
+│   ├── focus.js       # focus ticket: commitment, clock or ruler, parking lot
 │   ├── badge.js       # sideways badges (+ badge-draw.js)
 │   └── oracle.js      # 8-ball, tarot, dice, fortune cookie (+ oracle-draw.js)
 ├── ui/controls.js     # control schema → Web Awesome form components
@@ -156,11 +156,11 @@ Stickers for a bullet journal, drawn on **the grid of your notebook** (*Pas de l
 
 ### Ticket de focus
 
-One task, one way to know it is done, a block of time to cross off, the steps, and a parking lot. To stick on the desk for a work session.
+A commitment rather than a tracker: nothing to tick. One task, one way to know it is done, and the stretch of time you give it. To stick on the desk for a work session.
 
 - **Task** and **"Terminé quand…"** (the definition of done); left empty, they become lines to write on.
-- **Time**: *Minuteur* (one square = 5 minutes, one row = one hour, from 15 min to 4 h) or *Pomodoros* (squares for work, rings for breaks; length, break and number of rounds adjustable). The start time (empty = now) gives the end time.
-- **Étapes** with drawn checkboxes, an optional **"Avant de commencer"** check-list (notifications off, phone out of sight…), and a **parking** for intrusive thoughts: *note it, come back*.
+- **Time**: duration (15 min to 4 h) and start time (empty = now). Drawn as a **Cadran** (a 12 h clock face with the committed stretch filled in, to read against the wall clock) or a **Règle** (an hour ruler with a bar at the real position of the block).
+- Optional **first move** (the 2-minute gesture that gets you started), **"Si je me disperse, je reviens à…"**, a **parking** for intrusive thoughts (*note it, come back*) and a signature line.
 
 ### Spécimen de fonts
 

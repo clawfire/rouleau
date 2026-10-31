@@ -10,7 +10,7 @@ State of Rouleau on 26 Oct 2026 (after the first local Claude Code session).
   - **Séance de sport** (`workout.js`): *à faire* (Hevy routine, drawn checkbox per set), *Bilan* (totals + PRs, *Court* / *Complet*), *Vierge*
   - **Ticket du matin** (`morning.js`, composer UI in `ui/composer.js`, model in `morning-model.js`): a greeting, then the sections you pick and drag into order (weather, agenda, priorities, quote, games, workout, bujo, focus, oracle…), each with its own settings; saved in localStorage. Old flat settings are migrated on first open. The bricks (`weather.js`, `agenda.js`, `priorities.js`, `quote.js`) are also modules of their own, in the collapsed "Briques" menu section.
   - **Bullet journal** (`bujo.js`): habit tracker (month / week), week Mon → Sun with 3 lines a day, daily log, key; grid step adjustable (5 mm = Leuchtturm dot grid)
-  - **Ticket de focus** (`focus.js`): task, definition of done, 5-minute squares or pomodoros, steps, parking lot
+  - **Ticket de focus** (`focus.js`): a commitment, nothing to tick: task, definition of done, the time drawn as a 12 h clock wedge or an hour ruler (`focus-draw.js`), first move, "if I get distracted" line, parking lot, optional signature
   - **QR utilitaires** (`qr.js`, payloads + matrix in `services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
   - **Badges** (`badge.js` + `badge-draw.js`): conference / visitor / hello, 48 mm tall by 60–160 mm long; optional dithered photo and QR
   - **L'oracle** (`oracle.js` + `oracle-draw.js`): 8-ball, tarot (22 drawn cards, reversed = whole card upside down), dice, fortune cookie; seeded draw
