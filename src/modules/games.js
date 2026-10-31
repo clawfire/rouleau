@@ -66,6 +66,7 @@ export default {
     starsSize: 7,
     linkSize: 6,
     solution: false,
+    daily: false,
     seed: Math.floor(Math.random() * 2 ** 31),
   },
 
@@ -95,29 +96,29 @@ export default {
     if (v.game === 'link') schema.push({ type: 'slider', key: 'linkSize', label: 'Taille de la grille', min: 5, max: 7, step: 1 });
     schema.push(
       { type: 'switch', key: 'solution', label: 'Imprimer la solution (en bas, à l’envers)' },
-      {
+      { type: 'switch', key: 'daily', label: 'Grille du jour', hint: 'La même toute la journée, une nouvelle demain.', refresh: true },
+    );
+    if (!v.daily) {
+      schema.push({
         type: 'button',
         label: 'Nouvelle grille',
         variant: 'brand',
         refresh: false,
         onClick: (values) => (values.seed = Math.floor(Math.random() * 2 ** 31)),
-      },
-    );
+      });
+    }
     return schema;
   },
 
-  async build(v) {
-    const blocks = await puzzleBlocks(v);
-    blocks.push(space(8), rule({ style: 'zigzag', thickness: 2 }), text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }));
-    return blocks;
-  },
+  blocks: (v) => puzzleBlocks(v),
 };
 
-/**
- * Header, grid and rules of one puzzle, optionally followed by its answer. Also used by the morning ticket.
- * @param {{ game: string, level: string, starsSize: number, linkSize: number, seed: number, solution?: boolean }} v
- */
-export async function puzzleBlocks(v) {
+/** Seeded by the date: the same grid all day. */
+const dailySeed = (now = new Date()) => now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+
+/** Header, grid and rules of one puzzle, optionally followed by its answer. */
+async function puzzleBlocks(values) {
+  const v = values.daily ? { ...values, seed: dailySeed() } : values;
   await Promise.all(DRAW_FONTS.map((f) => document.fonts.load(f, '0123456789').catch(() => null)));
   const key = v.game in GAMES ? v.game : 'sudoku';
   const game = GAMES[key];

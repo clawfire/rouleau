@@ -78,6 +78,7 @@ const FIELDS = {
 
 export default {
   id: 'qr',
+  composable: false,
   label: 'QR utilitaires',
   icon: 'qrcode',
   description: 'Wi-Fi, contact, lien, SMS, appel, e-mail, GPS ou texte : un QR code net, avec les détails écrits dessous.',

@@ -10,6 +10,8 @@ import { draw, space, text } from '../engine/blocks.js';
 import { DOTS_PER_MM, PRINT_WIDTH as W } from '../engine/constants.js';
 import { TYPE } from '../fonts.js';
 import { CalendarError, agenda } from '../services/calendar.js';
+import { store } from '../store.js';
+import { legacyMorning } from './brick.js';
 
 const ARCHIVO = 'Archivo Black';
 const BODY = 'Atkinson Hyperlegible';
@@ -356,14 +358,8 @@ const TYPES = [
 
 const cellOf = (mm) => Math.max(28, Math.round((Number(mm) || 5) * DOTS_PER_MM));
 
-/** The calendar addresses typed in the morning ticket, so they are not asked twice. */
-function savedCalendar() {
-  try {
-    return JSON.parse(localStorage.getItem('rouleau:module:morning') ?? '{}').icsUrls ?? '';
-  } catch {
-    return '';
-  }
-}
+/** The calendar addresses typed in the agenda module (or the morning ticket), so they are not asked twice. */
+const savedCalendar = () => store.get('module:agenda', {}).icsUrls || legacyMorning('icsUrls', '');
 
 export default {
   id: 'bujo',
@@ -446,7 +442,9 @@ export default {
     return schema;
   },
 
-  async build(v) {
+  footer: false,
+
+  async blocks(v) {
     await Promise.all(FONTS.map((f) => document.fonts.load(f, 'AaÉé09').catch(() => null)));
     const cell = cellOf(v.pitchMm);
     const date = parseDate(v.date);

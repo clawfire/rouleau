@@ -24,6 +24,7 @@
 - Keep everything 384 px wide; no horizontal inset by default (the printer has physical margins).
 - Typography: use `TYPE` from `src/fonts.js`. Text ≥ 18 px. Section headers are black bands (`invert`), solid at max density; `frame` for outlined bands.
 - Default dither: Atkinson. Checkboxes must be drawn, not typed.
+- Modules return `blocks(values)` (the ticket without its signature); `buildTicket()` in `modules/index.js` adds the shared footer. The morning ticket stacks the `blocks` of any module not flagged `composable: false` (QR, badges and dev tools are). Its composition is saved per user (`sections` in `rouleau:module:morning`, shape and legacy migration in `modules/morning-model.js`).
 - ⌘P output is split into pages of max 297 mm (driver "Ticket 48 mm" size), cut on block boundaries (`engine/paginate.js`). Bluetooth and PNG are not limited.
 
 ## Roadmap (nav entries flagged `soon`)

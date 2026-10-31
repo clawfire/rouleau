@@ -31,33 +31,16 @@ import './styles.css';
 import { MAX_PAGE_MM, PAPERS, PRINT_WIDTH, dotsToMm, estimatePrintSeconds, mmToDots } from './engine/constants.js';
 import { paginate } from './engine/paginate.js';
 import { renderTicket } from './engine/render.js';
-import { MODULES, PAGES, moduleById } from './modules/index.js';
+import { MODULES, PAGES, buildTicket, moduleById } from './modules/index.js';
 import { T02Bluetooth, isBluetoothAvailable } from './print/bluetooth.js';
 import { downloadPNG, systemPrint } from './print/system.js';
 import { renderAbout } from './ui/about.js';
 import { renderControls } from './ui/controls.js';
+import { store } from './store.js';
 
 /* ---------- Small helpers ---------- */
 
 const $ = (sel) => document.querySelector(sel);
-
-const store = {
-  get(key, fallback) {
-    try {
-      const raw = localStorage.getItem(`rouleau:${key}`);
-      return raw ? { ...fallback, ...JSON.parse(raw) } : { ...fallback };
-    } catch {
-      return { ...fallback };
-    }
-  },
-  set(key, value) {
-    try {
-      localStorage.setItem(`rouleau:${key}`, JSON.stringify(value));
-    } catch {
-      // Private mode or storage disabled: settings just won't persist.
-    }
-  },
-};
 
 const debounce = (fn, ms) => {
   let t;
@@ -91,9 +74,6 @@ const printer = new T02Bluetooth();
 
 /* ---------- Navigation ---------- */
 
-/** Whether the "Développeurs" group is expanded; it opens by itself when one of its modules is selected. */
-let devNavOpen = false;
-
 function navItem(m) {
   const item = document.createElement(m.soon ? 'span' : 'a');
   item.className = 'nav-item';
@@ -115,34 +95,46 @@ function navItem(m) {
   return item;
 }
 
-/** Modules flagged `group: 'dev'` (tools for tuning Rouleau itself) live in a collapsed section. */
+/** Collapsed sections of the menu, for modules flagged with a `group`. */
+const NAV_GROUPS = {
+  bricks: { label: 'Briques du ticket du matin', icon: 'cubes' },
+  dev: { label: 'Développeurs', icon: 'code' },
+};
+const navOpen = new Set();
+
+function navGroup(id, modules) {
+  if (modules.some((m) => m.id === state.module?.id)) navOpen.add(id);
+  const group = document.createElement('wa-details');
+  group.className = 'nav-group';
+  group.setAttribute('appearance', 'plain');
+  group.setAttribute('icon-placement', 'end');
+  group.toggleAttribute('open', navOpen.has(id));
+  const summary = document.createElement('span');
+  summary.slot = 'summary';
+  summary.className = 'nav-group-title';
+  const icon = document.createElement('wa-icon');
+  icon.setAttribute('name', NAV_GROUPS[id].icon);
+  summary.append(icon, NAV_GROUPS[id].label);
+  const list = document.createElement('div');
+  list.className = 'wa-stack wa-gap-3xs';
+  list.append(...modules.map(navItem));
+  group.append(summary, list);
+  group.addEventListener('wa-show', () => navOpen.add(id));
+  group.addEventListener('wa-hide', () => navOpen.delete(id));
+  return group;
+}
+
 function renderNav() {
   const nav = $('#module-nav');
-  const dev = MODULES.filter((m) => m.group === 'dev');
-  const items = [...MODULES.filter((m) => m.group !== 'dev'), ...PAGES].map(navItem);
-  items.splice(MODULES.filter((m) => m.group !== 'dev').length, 0, Object.assign(document.createElement('hr'), { className: 'nav-sep' }));
-  if (dev.length) {
-    if (dev.some((m) => m.id === state.module?.id)) devNavOpen = true;
-    const group = document.createElement('wa-details');
-    group.className = 'nav-group';
-    group.setAttribute('appearance', 'plain');
-    group.setAttribute('icon-placement', 'end');
-    group.toggleAttribute('open', devNavOpen);
-    const summary = document.createElement('span');
-    summary.slot = 'summary';
-    summary.className = 'nav-group-title';
-    const icon = document.createElement('wa-icon');
-    icon.setAttribute('name', 'code');
-    summary.append(icon, 'Développeurs');
-    const list = document.createElement('div');
-    list.className = 'wa-stack wa-gap-3xs';
-    list.append(...dev.map(navItem));
-    group.append(summary, list);
-    group.addEventListener('wa-show', () => (devNavOpen = true));
-    group.addEventListener('wa-hide', () => (devNavOpen = false));
-    items.push(group);
-  }
-  nav.replaceChildren(...items);
+  const inGroup = (id) => MODULES.filter((m) => m.group === id);
+  const sep = Object.assign(document.createElement('hr'), { className: 'nav-sep' });
+  nav.replaceChildren(
+    ...MODULES.filter((m) => !m.group).map(navItem),
+    navGroup('bricks', inGroup('bricks')),
+    sep,
+    ...PAGES.map(navItem),
+    navGroup('dev', inGroup('dev')),
+  );
 }
 
 /** Show a page of the menu that is not a module: no controls, no preview, no print buttons. */
@@ -183,6 +175,16 @@ function selectModule(id) {
 async function renderModuleControls() {
   const mod = state.module;
   const container = $('#module-controls');
+  if (mod.panel) {
+    mod.panel(container, {
+      values: state.values,
+      onChange: (values) => {
+        store.set(`module:${mod.id}`, values);
+        scheduleRender();
+      },
+    });
+    return;
+  }
   let schema = mod.controls ?? [];
   if (typeof schema === 'function') {
     container.replaceChildren(Object.assign(document.createElement('wa-spinner'), {}));
@@ -215,7 +217,7 @@ async function render() {
   const spinner = $('#rendering');
   spinner.hidden = false;
   try {
-    const blocks = await state.module.build(state.values);
+    const blocks = await buildTicket(state.module, state.values);
     const bitmap = await renderTicket(blocks);
     if (id !== state.renderId) return; // a newer render started meanwhile
     state.bitmap = bitmap;

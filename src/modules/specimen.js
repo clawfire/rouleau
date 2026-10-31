@@ -15,6 +15,7 @@ const parseSizes = (s) =>
 
 export default {
   id: 'specimen',
+  composable: false,
   label: 'Spécimen de fonts',
   icon: 'font',
   group: 'dev', // listed under the collapsed "Développeurs" section of the menu
@@ -60,7 +61,7 @@ export default {
   ],
 
   /** @returns {object[]} blocks */
-  build(v) {
+  blocks(v) {
     const now = new Date();
     const date = now.toLocaleDateString('fr-LU', { day: '2-digit', month: '2-digit', year: 'numeric' });
     const time = now.toLocaleTimeString('fr-LU', { hour: '2-digit', minute: '2-digit' });
@@ -123,11 +124,6 @@ export default {
       blocks.push(rule({ style: 'dashed', thickness: 2 }));
     }
 
-    blocks.push(
-      space(4),
-      text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
-      rule({ style: 'zigzag', thickness: 2 }),
-    );
     return blocks;
   },
 };

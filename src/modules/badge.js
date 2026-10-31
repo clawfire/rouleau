@@ -93,6 +93,7 @@ const timeText = () => new Date().toLocaleTimeString('fr-LU', { hour: '2-digit',
 
 export default {
   id: 'badge',
+  composable: false,
   label: 'Badges',
   icon: 'id-badge',
   description: 'Badge de conférence, de visiteur ou « Hello ». Le badge est couché : sa hauteur est celle de la tête (48 mm), tu choisis la longueur.',

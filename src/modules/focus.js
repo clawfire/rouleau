@@ -136,7 +136,7 @@ export default {
     return schema;
   },
 
-  async build(v) {
+  async blocks(v) {
     await fontsReady();
     const { items, minutes, label } = plan(v);
     const start = startMinutes(v.start);
@@ -175,7 +175,6 @@ export default {
       blocks.push(space(10), text('Parking', TYPE.section), space(2), text('Une idée parasite ? Note-la, reviens.', { ...TYPE.caption, align: 'center' }), lines(Math.max(1, Number(v.parkingLines) || 3), { gap: 38 }));
     }
 
-    blocks.push(space(8), rule({ style: 'zigzag', thickness: 2 }), text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }));
     return blocks;
   },
 };

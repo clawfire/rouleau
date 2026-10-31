@@ -272,3 +272,54 @@ a.nav-item[aria-current='page'] wa-icon {
   overflow: hidden;
   clip-path: inset(50%);
 }
+
+/* Composer of the morning ticket */
+.composer-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wa-space-s);
+}
+
+.composer-card {
+  border: var(--wa-border-width-s) var(--wa-border-style) var(--wa-color-surface-border);
+  border-radius: var(--wa-border-radius-m);
+  background: var(--wa-color-surface-default);
+  padding: var(--wa-space-xs) var(--wa-space-s);
+}
+
+.composer-card.dragging {
+  opacity: 0.4;
+}
+
+.composer-card.drop-before {
+  box-shadow: 0 calc(-1 * var(--wa-space-xs)) 0 -2px var(--wa-color-brand-fill-loud);
+}
+
+.composer-list.drop-end {
+  box-shadow: 0 var(--wa-space-xs) 0 -2px var(--wa-color-brand-fill-loud);
+}
+
+.composer-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-2xs);
+}
+
+.composer-grip {
+  cursor: grab;
+  padding: var(--wa-space-2xs);
+  touch-action: none;
+}
+
+.composer-name {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--wa-space-xs);
+  font-weight: var(--wa-font-weight-bold);
+}
+
+.composer-empty {
+  margin: 0;
+  color: var(--wa-color-text-quiet);
+}

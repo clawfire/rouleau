@@ -260,7 +260,7 @@ export default {
     return schema;
   },
 
-  build(v) {
+  blocks(v) {
     if (v.mode === 'blank') return buildBlank(v);
     return v.mode === 'recap' ? buildRecap(v) : buildPlan(v);
   },
@@ -333,11 +333,6 @@ async function buildPlan(v) {
     );
   }
 
-  blocks.push(
-    space(8),
-    text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
-    rule({ style: 'zigzag', thickness: 2 }),
-  );
   return blocks;
 }
 
@@ -405,11 +400,6 @@ function buildBlank(v) {
 
   if (v.notes) blocks.push(space(6), text('Notes', TYPE.section), lines(3), space(10), energyRow());
 
-  blocks.push(
-    space(8),
-    text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
-    rule({ style: 'zigzag', thickness: 2 }),
-  );
   return blocks;
 }
 
@@ -502,11 +492,6 @@ async function buildRecap(v) {
     });
   }
 
-  blocks.push(
-    space(8),
-    text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' }),
-    rule({ style: 'zigzag', thickness: 2 }),
-  );
   return blocks;
 }
 

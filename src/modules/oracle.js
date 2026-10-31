@@ -84,8 +84,6 @@ const header = (v, title) => {
   return blocks;
 };
 
-const footer = () => [space(8), rule({ style: 'zigzag', thickness: 2 }), text('Imprimé avec Rouleau', { ...TYPE.caption, align: 'center' })];
-
 const BUILD = {
   ball(v, rand) {
     const [kind, answer] = pick(rand, BALL);
@@ -94,7 +92,6 @@ const BUILD = {
       ...header(v, 'Boule magique'),
       space(6),
       ball(mood, answer),
-      ...footer(),
     ];
   },
 
@@ -115,7 +112,7 @@ const BUILD = {
       );
       if (i < drawn.length - 1) blocks.push(space(6), rule({ style: 'dashed', thickness: 2, margin: 4 }));
     });
-    return [...blocks, ...footer()];
+    return blocks;
   },
 
   dice(v, rand) {
@@ -129,7 +126,7 @@ const BUILD = {
       dice(rolls, faces),
     ];
     if (count > 1) blocks.push(space(10), row('Total', String(total), { ...TYPE.strong, size: 28 }));
-    return [...blocks, ...footer()];
+    return blocks;
   },
 
   fortune(v, rand) {
@@ -143,7 +140,6 @@ const BUILD = {
       ...header(v, 'Biscuit'),
       space(6),
       cookie(pick(rand, FORTUNES), numbers),
-      ...footer(),
     ];
   },
 };
@@ -195,7 +191,7 @@ export default {
     return schema;
   },
 
-  async build(v) {
+  async blocks(v) {
     await Promise.all(DRAW_FONTS.map((f) => document.fonts.load(f, 'AaÉé09').catch(() => null)));
     const rand = prng(v.seed);
     return (BUILD[v.mode] ?? BUILD.ball)(v, rand);

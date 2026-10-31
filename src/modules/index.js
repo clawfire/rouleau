@@ -12,27 +12,34 @@
  *   }
  *
  * Planned modules are listed with `soon: true` so the navigation shows the roadmap.
+ *
+ * Composable modules implement `blocks(values)` instead of `build`: the ticket without its signature.
+ * `buildTicket` adds the shared footer (unless the module sets `footer: false`), and the morning ticket
+ * stacks the `blocks` of several modules under a single footer. Modules with `composable: false`
+ * (QR, sideways badges, dev tools) keep a plain `build`.
+ *   panel?(container, { values, onChange })  replaces the generic controls (the morning ticket's composer)
+ *   group?: 'bricks'  small building blocks (weather, agenda…) in their own collapsed section of the menu
  */
-import specimen from './specimen.js';
-import badge from './badge.js';
-import bujo from './bujo.js';
-import focus from './focus.js';
-import games from './games.js';
+import { footer } from './footer.js';
 import morning from './morning.js';
-import oracle from './oracle.js';
-import qr from './qr.js';
-import workout from './workout.js';
+import { PARTS } from './registry.js';
+
+const part = (id) => PARTS.find((m) => m.id === id);
 
 export const MODULES = [
-  workout,
+  part('workout'),
   morning,
-  bujo,
-  focus,
-  qr,
-  badge,
-  oracle,
-  games,
-  specimen,
+  part('bujo'),
+  part('focus'),
+  part('qr'),
+  part('badge'),
+  part('oracle'),
+  part('games'),
+  part('weather'),
+  part('agenda'),
+  part('priorities'),
+  part('quote'),
+  part('specimen'),
   { id: 'photo', label: 'Labo photo', icon: 'camera-retro', soon: true },
   { id: 'tasks', label: 'Tickets de tâches', icon: 'list-check', soon: true },
 ];
@@ -41,3 +48,10 @@ export const MODULES = [
 export const PAGES = [{ id: 'about', label: 'Et plus encore', icon: 'heart' }];
 
 export const moduleById = (id) => MODULES.find((m) => m.id === id && !m.soon) ?? MODULES[0];
+
+/** The blocks of a whole ticket for a module. */
+export async function buildTicket(mod, values) {
+  if (!mod.blocks) return mod.build(values);
+  const blocks = await mod.blocks(values);
+  return mod.footer === false ? blocks : [...blocks, ...footer()];
+}

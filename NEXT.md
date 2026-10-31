@@ -8,7 +8,7 @@ State of Rouleau on 26 Oct 2026 (after the first local Claude Code session).
 - Live: https://rouleau-t02.netlify.app (Netlify team `clawfire`, auto-deploy on every push to `main`).
 - Modules done (nav order):
   - **Séance de sport** (`workout.js`): *à faire* (Hevy routine, drawn checkbox per set), *Bilan* (totals + PRs, *Court* / *Complet*), *Vierge*
-  - **Ticket du matin** (`morning.js`): weather (Open-Meteo), agenda (Google secret iCal via `ical.js`), 3 priorities, quote; each section togglable; optional puzzle of the day at the bottom (`puzzleBlocks()` from `games.js`, seeded by the date)
+  - **Ticket du matin** (`morning.js`, composer UI in `ui/composer.js`, model in `morning-model.js`): a greeting, then the sections you pick and drag into order (weather, agenda, priorities, quote, games, workout, bujo, focus, oracle…), each with its own settings; saved in localStorage. Old flat settings are migrated on first open. The bricks (`weather.js`, `agenda.js`, `priorities.js`, `quote.js`) are also modules of their own, in the collapsed "Briques" menu section.
   - **Bullet journal** (`bujo.js`): habit tracker (month / week), week Mon → Sun with 3 lines a day, daily log, key; grid step adjustable (5 mm = Leuchtturm dot grid)
   - **Ticket de focus** (`focus.js`): task, definition of done, 5-minute squares or pomodoros, steps, parking lot
   - **QR utilitaires** (`qr.js`, payloads + matrix in `services/qr-payload.js`): Wi-Fi, vCard, URL, text, SMS, call, e-mail, WhatsApp, GPS
@@ -18,6 +18,8 @@ State of Rouleau on 26 Oct 2026 (after the first local Claude Code session).
   - **Spécimen de fonts** (`specimen.js`), under the collapsed "Développeurs" menu (`group: 'dev'`)
 - Pages that are not modules (`PAGES` in `modules/index.js`, `showPage()` in `main.js`): **Et plus encore** (`ui/about.js`): why Rouleau exists, the macOS driver, the suggestion link, what leaves the browser, credits. The menu footer always shows "Fait par Thibault Milan" (thibaultmilan.com) and a link to the repo.
 - UI: Web Awesome Pro, Brutalist theme. Preview shows 4 mm of paper on each side of the 48 mm print.
+
+- Modules implement `blocks(v)`; `buildTicket()` appends the footer. `composable: false` = QR, badges (sideways), specimen. Drag and drop is native HTML5 (grip handle); arrows are the touch/keyboard fallback.
 
 ## Deployment (Netlify)
 
