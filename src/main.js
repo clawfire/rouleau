@@ -36,6 +36,7 @@ import { MODULES, PAGES, buildTicket, moduleById } from './modules/index.js';
 import { T02Bluetooth, isBluetoothAvailable } from './print/bluetooth.js';
 import { downloadPNG, systemPrint } from './print/system.js';
 import { renderAbout } from './ui/about.js';
+import { offerCoffee } from './ui/coffee-dialog.js';
 import { applyLayers } from './engine/layers.js';
 import { renderControls } from './ui/controls.js';
 import { createEditor } from './ui/editor.js';
@@ -388,7 +389,11 @@ const fileName = () => {
 
 $('#btn-png').addEventListener('click', () => state.bitmap && downloadPNG(state.bitmap, fileName()));
 
-$('#btn-system').addEventListener('click', () => state.bitmap && systemPrint(state.bitmap));
+$('#btn-system').addEventListener('click', async () => {
+  if (!state.bitmap) return;
+  await systemPrint(state.bitmap);
+  offerCoffee();
+});
 
 $('#btn-ble').addEventListener('click', async (e) => {
   if (!state.bitmap) return;
@@ -403,6 +408,7 @@ $('#btn-ble').addEventListener('click', async (e) => {
     });
     const battery = printer.battery != null ? ` · batterie ${printer.battery} %` : '';
     setStatus(`Imprimé${battery}`, 'success');
+    offerCoffee();
   } catch (err) {
     if (err?.name === 'NotFoundError') setStatus('Aucune T02 sélectionnée.', 'neutral');
     else setStatus(err.message ?? String(err), 'danger');

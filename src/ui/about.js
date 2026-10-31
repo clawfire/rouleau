@@ -14,6 +14,8 @@ const el = (tag, attrs = {}, children = []) => {
   return node;
 };
 
+export const COFFEE = 'https://buymeacoffee.com/thibault';
+
 const link = (href, label) => el('a', { href, target: '_blank', rel: 'noopener noreferrer' }, [label]);
 
 function button(href, label, { icon, variant = 'neutral', appearance = 'outlined', family = 'brands' } = {}) {
@@ -48,6 +50,12 @@ export function renderAbout(container) {
           'Un ticket, un badge, un autocollant que tu aimerais imprimer ? Ouvre une issue sur GitHub : un petit formulaire t’aide à décrire l’idée (il faut un compte GitHub, et la suggestion est publique). Les modules à venir sont dans le menu, marqués « bientôt ».',
         ]),
         el('div', { class: 'wa-cluster wa-gap-s' }, [button(SUGGEST, 'Suggérer un module', { icon: 'lightbulb', family: 'solid', variant: 'brand', appearance: 'accent' })]),
+      ),
+
+      section(
+        'Un café ?',
+        el('p', {}, ['Rouleau est gratuit et le restera. Si ça t’a servi ou fait sourire, tu peux m’offrir un café.']),
+        el('div', { class: 'wa-cluster wa-gap-s' }, [button(COFFEE, 'Offrir un café', { icon: 'mug-hot', family: 'solid' })]),
       ),
 
       section(
