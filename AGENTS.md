@@ -30,4 +30,4 @@
 
 ## Roadmap (nav entries flagged `soon`)
 
-Task tickets (GitHub/Jira, Octicons MIT). Done: Photo lab (session-only photo, `transient` in `main.js`), Workout (Hevy), Morning ticket, QR utilities, Badges, Oracle, Bullet journal, Focus ticket, Games (sudoku, Star Battle, Numberlink; unique solutions checked by pure solvers in `games-*.js`).
+Task tickets (GitHub/Jira, Octicons MIT). Done: Photo lab (session-only photo, `transient` in `main.js`), Workout (Hevy), Morning ticket, QR utilities, Badges, Oracle, Bullet journal, Focus ticket, Parcel label (Vinted import, see `src/modules/colis-README.md`), Games (sudoku, Star Battle, Numberlink; unique solutions checked by pure solvers in `games-*.js`).

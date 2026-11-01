@@ -11,6 +11,10 @@ import '@fontsource/atkinson-hyperlegible/latin-700.css';
 import '@fontsource/atkinson-hyperlegible/latin-ext-400.css';
 import '@fontsource/atkinson-hyperlegible/latin-ext-700.css';
 import '@fontsource/archivo-black/latin-400.css';
+import '@fontsource/barlow-condensed/latin-700.css';
+import '@fontsource/barlow-condensed/latin-800.css';
+import '@fontsource/ibm-plex-mono/latin-400.css';
+import '@fontsource/ibm-plex-mono/latin-700.css';
 import './fonts.css'; // Departure Mono (not on npm, vendored in src/assets/fonts)
 
 export const FONTS = [

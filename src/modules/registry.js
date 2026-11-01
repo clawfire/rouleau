@@ -2,6 +2,7 @@
 import agenda from './agenda.js';
 import badge from './badge.js';
 import bujo from './bujo.js';
+import colis from './colis.js';
 import focus from './focus.js';
 import games from './games.js';
 import oracle from './oracle.js';
@@ -13,4 +14,4 @@ import specimen from './specimen.js';
 import weather from './weather.js';
 import workout from './workout.js';
 
-export const PARTS = [workout, bujo, focus, qr, badge, photo, oracle, games, weather, agenda, priorities, quote, specimen];
+export const PARTS = [workout, bujo, focus, colis, qr, badge, photo, oracle, games, weather, agenda, priorities, quote, specimen];

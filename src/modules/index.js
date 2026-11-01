@@ -31,6 +31,7 @@ export const MODULES = [
   part('workout'),
   part('bujo'),
   part('focus'),
+  part('colis'),
   part('qr'),
   part('badge'),
   part('photo'),

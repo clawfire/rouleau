@@ -16,6 +16,7 @@ import '@awesome.me/webawesome-pro/dist/components/spinner/spinner.js';
 import '@awesome.me/webawesome-pro/dist/components/input/input.js';
 import '@awesome.me/webawesome-pro/dist/components/textarea/textarea.js';
 import '@awesome.me/webawesome-pro/dist/components/slider/slider.js';
+import '@awesome.me/webawesome-pro/dist/components/date-input/date-input.js';
 import '@awesome.me/webawesome-pro/dist/components/switch/switch.js';
 import '@awesome.me/webawesome-pro/dist/components/checkbox/checkbox.js';
 import '@awesome.me/webawesome-pro/dist/components/checkbox-group/checkbox-group.js';

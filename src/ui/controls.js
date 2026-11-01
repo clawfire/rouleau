@@ -1,7 +1,7 @@
 /**
  * Schema → Web Awesome form controls.
  *
- * Supported types: text, textarea, slider, switch, checkboxes, radio, select, image, button, buttons (a row of buttons), callout, custom (a module-owned widget), section (a titled card grouping the controls after it).
+ * Supported types: text, textarea, slider, date, switch, checkboxes, radio, select, image, button, buttons (a row of buttons), callout, custom (a module-owned widget), section (a titled card grouping the controls after it).
  * Every control writes into `values[key]` and calls `onChange(values)`.
  * Controls flagged `refresh: true` also call `onRefresh(values)` when committed,
  * so a module can rebuild its controls (e.g. load routines once an API key is set).
@@ -85,6 +85,16 @@ export function renderControls(container, schema, values, onChange, onRefresh) {
         node.value = values[c.key] ?? '';
         node.addEventListener('input', () => {
           values[c.key] = node.value;
+          emit();
+        });
+        break;
+      }
+      case 'date': {
+        // Web Awesome date input (segmented field + calendar popup). Stores an ISO `YYYY-MM-DD`, or '' when cleared.
+        node = el('wa-date-input', { label: c.label, hint: c.hint, 'with-clear': true });
+        node.value = values[c.key] ?? '';
+        node.addEventListener('change', () => {
+          values[c.key] = node.value || '';
           emit();
         });
         break;
