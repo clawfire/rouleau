@@ -108,7 +108,12 @@ export async function unseal(value, secret) {
  * Launchpad only redirects to the URI registered on the integration, so every origin uses the main
  * site's callback (Netlify sets URL to it); deploy previews get the session back through /adopt.
  */
-const redirectUri = (req, env) => env.BASECAMP_REDIRECT_URI || `${env.URL || new URL(req.url).origin}${PREFIX}/callback`;
+export function redirectUri(req, env) {
+  if (env.BASECAMP_REDIRECT_URI) return env.BASECAMP_REDIRECT_URI.trim();
+  // Netlify's URL can read http:// on a custom domain set-up; the callback is always served over https.
+  const home = (env.URL || new URL(req.url).origin).replace(/^http:\/\/(?!localhost|127\.0\.0\.1)/, 'https://').replace(/\/+$/, '');
+  return `${home}${PREFIX}/callback`;
+}
 
 /** Origins the main site may hand a session to: itself and its Netlify deploy previews / branch deploys. */
 export function allowedOrigin(origin, req, env) {
@@ -264,9 +269,10 @@ export async function handle(req, env, fetchImpl = fetch) {
   const s = await session(req, env, fetchImpl);
 
   if (route === '/status') {
-    if (!s) return json({ connected: false, configured: true });
+    // The exact URI sent to Launchpad: shown in the UI, so it can be copied into the integration.
+    if (!s) return json({ connected: false, configured: true, redirectUri: redirectUri(req, env) });
     const res = await apiFetch(`${LAUNCHPAD}/authorization.json`, s.a, fetchImpl);
-    if (!res.ok) return json({ connected: false, configured: true });
+    if (!res.ok) return json({ connected: false, configured: true, redirectUri: redirectUri(req, env) });
     const me = await res.json();
     const accounts = (me.accounts ?? []).filter((a) => a.product === 'bc3').map((a) => ({ id: a.id, name: a.name }));
     const name = [me.identity?.first_name, me.identity?.last_name].filter(Boolean).join(' ');

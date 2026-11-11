@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { areaTags, clip, effortLevel, htmlToLines, parseBoardUrl, parseFields, shortName, toIdea } from '../src/basecamp/idea.js';
-import { ALLOWED_PATH, allowedOrigin, handle, nextLink, readCookies, seal, unseal } from '../src/basecamp/oauth-core.js';
+import { ALLOWED_PATH, allowedOrigin, handle, redirectUri, nextLink, readCookies, seal, unseal } from '../src/basecamp/oauth-core.js';
 
 /* ---------- Card parsing ---------- */
 
@@ -219,4 +219,14 @@ test('helpers', () => {
   assert.equal(nextLink('<https://3.basecampapi.com/x?page=2>; rel="next"'), 'https://3.basecampapi.com/x?page=2');
   assert.equal(nextLink('<https://evil.example/x>; rel="next"'), null);
   assert.deepEqual(readCookies(new Request(ORIGIN, { headers: { cookie: 'a=1; b=2=3' } })), { a: '1', b: '2=3' });
+});
+
+test('redirectUri: override, Netlify URL (upgraded to https), request origin; exposed by /status', async () => {
+  const req = new Request('https://deploy-preview-2--rouleau-t02.netlify.app/api/basecamp/status');
+  assert.equal(redirectUri(req, { BASECAMP_REDIRECT_URI: ' https://x.test/cb ' }), 'https://x.test/cb');
+  assert.equal(redirectUri(req, { URL: 'http://rouleau-t02.netlify.app/' }), 'https://rouleau-t02.netlify.app/api/basecamp/callback');
+  assert.equal(redirectUri(req, { URL: 'http://localhost:8888' }), 'http://localhost:8888/api/basecamp/callback');
+  assert.equal(redirectUri(req, {}), 'https://deploy-preview-2--rouleau-t02.netlify.app/api/basecamp/callback');
+  const st = await (await handle(req, { ...ENV, URL: 'https://rouleau-t02.netlify.app' })).json();
+  assert.equal(st.redirectUri, 'https://rouleau-t02.netlify.app/api/basecamp/callback');
 });

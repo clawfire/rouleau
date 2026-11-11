@@ -103,6 +103,7 @@ function navItem(m) {
 
 /** Collapsed sections of the menu, for modules flagged with a `group`. */
 const NAV_GROUPS = {
+  tasks: { label: 'Tickets de tâches', icon: 'list-check' },
   bricks: { label: 'Briques du ticket du matin', icon: 'cubes' },
   dev: { label: 'Développeurs', icon: 'code' },
 };
@@ -136,6 +137,7 @@ function renderNav() {
   const sep = Object.assign(document.createElement('hr'), { className: 'nav-sep' });
   nav.replaceChildren(
     ...MODULES.filter((m) => !m.group).map(navItem),
+    navGroup('tasks', inGroup('tasks')),
     navGroup('bricks', inGroup('bricks')),
     sep,
     ...PAGES.map(navItem),

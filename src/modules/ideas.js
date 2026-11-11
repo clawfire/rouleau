@@ -168,6 +168,7 @@ export default {
   id: 'ideas',
   label: 'Idées d’amélioration',
   icon: 'lightbulb',
+  group: 'tasks',
   description: 'Les cartes d’un tableau Basecamp en petits tickets à garder sous les yeux : le problème, l’impact, l’effort, et de quoi noter ton prochain pas.',
 
   defaults: {
@@ -198,6 +199,11 @@ export default {
       schema.push(
         { type: 'button', label: 'Se connecter à Basecamp', variant: 'brand', onClick: () => connect() },
         { type: 'callout', variant: 'neutral', text: 'Lecture seule. Le jeton reste dans un cookie du relais, jamais dans cette page. Sans connexion, l’aperçu utilise des idées de démo.' },
+        {
+          type: 'callout',
+          variant: 'neutral',
+          text: `Basecamp répond « redirect_uri is not approved » ? L’intégration Launchpad doit déclarer exactement : ${s.redirectUri ?? '(inconnue)'}`,
+        },
       );
     } else {
       schema.push(
