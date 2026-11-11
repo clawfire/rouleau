@@ -1,5 +1,7 @@
 # Netlify build. Needs one environment variable: WEBAWESOME_TOKEN (Web Awesome Pro token,
 # Site configuration › Environment variables, mark it as secret).
+# Basecamp ideas (optional): BASECAMP_CLIENT_ID and BASECAMP_CLIENT_SECRET (secret) from
+# launchpad.37signals.com/integrations, redirect URI https://<site>/api/basecamp/callback.
 [build]
   command = "npm run build"
   publish = "dist"

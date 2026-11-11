@@ -5,6 +5,7 @@ import bujo from './bujo.js';
 import colis from './colis.js';
 import focus from './focus.js';
 import games from './games.js';
+import ideas from './ideas.js';
 import oracle from './oracle.js';
 import photo from './photo.js';
 import priorities from './priorities.js';
@@ -14,4 +15,4 @@ import specimen from './specimen.js';
 import weather from './weather.js';
 import workout from './workout.js';
 
-export const PARTS = [workout, bujo, focus, colis, qr, badge, photo, oracle, games, weather, agenda, priorities, quote, specimen];
+export const PARTS = [workout, bujo, focus, ideas, colis, qr, badge, photo, oracle, games, weather, agenda, priorities, quote, specimen];
