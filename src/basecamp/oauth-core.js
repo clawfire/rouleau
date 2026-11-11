@@ -14,7 +14,8 @@
  *
  * Routes (all under /api/basecamp):
  *   GET /login?return=…  → Launchpad consent screen
- *   GET /callback        → token exchange, back to the app (#ideas)
+ *   GET /callback        → token exchange, back to the app (#ideas), or to /adopt on a deploy preview
+ *   GET /adopt?t=…       → a deploy preview takes the session handed over by the main site
  *   GET /status          → { connected, configured, name?, accounts? }
  *   POST /logout         → forget the session
  *   GET /api/<account>/buckets/<project>/card_tables/….json → Basecamp API (cards lists: all pages)
@@ -103,7 +104,24 @@ export async function unseal(value, secret) {
 
 /* ---------- Launchpad ---------- */
 
-const redirectUri = (req, env) => env.BASECAMP_REDIRECT_URI || `${new URL(req.url).origin}${PREFIX}/callback`;
+/**
+ * Launchpad only redirects to the URI registered on the integration, so every origin uses the main
+ * site's callback (Netlify sets URL to it); deploy previews get the session back through /adopt.
+ */
+const redirectUri = (req, env) => env.BASECAMP_REDIRECT_URI || `${env.URL || new URL(req.url).origin}${PREFIX}/callback`;
+
+/** Origins the main site may hand a session to: itself and its Netlify deploy previews / branch deploys. */
+export function allowedOrigin(origin, req, env) {
+  let o;
+  try {
+    o = new URL(origin);
+  } catch {
+    return false;
+  }
+  if (o.origin !== origin || o.protocol !== 'https:') return false;
+  const home = new URL(redirectUri(req, env)).host;
+  return o.host === home || (home.endsWith('.netlify.app') && o.host.endsWith(`--${home}`));
+}
 
 async function tokenRequest(params, fetchImpl) {
   const res = await fetchImpl(`${LAUNCHPAD}/authorization/token?${new URLSearchParams(params)}`, {
@@ -199,27 +217,43 @@ export async function handle(req, env, fetchImpl = fetch) {
   if (!configured) return json({ error: 'not-configured' }, 503);
 
   if (route === '/login') {
-    const state = b64u.encode(crypto.getRandomValues(new Uint8Array(18)));
-    const back = encodeURIComponent(safeReturn(url.searchParams.get('return')));
+    // The state is sealed and carries where to land: the callback may run on another origin (the main
+    // site, for a deploy preview) and cannot read this origin's cookies. The nonce cookie binds it here.
+    const nonce = b64u.encode(crypto.getRandomValues(new Uint8Array(18)));
+    const state = await seal({ n: nonce, o: url.origin, b: safeReturn(url.searchParams.get('return')), x: Date.now() + 600_000 }, env.BASECAMP_CLIENT_SECRET);
     const auth = `${LAUNCHPAD}/authorization/new?${new URLSearchParams({ type: 'web_server', client_id: env.BASECAMP_CLIENT_ID, redirect_uri: redirectUri(req, env), state })}`;
-    return redirect(auth, [cookie(STATE, `${state}.${back}`, req, { maxAge: 600 })]);
+    return redirect(auth, [cookie(STATE, nonce, req, { maxAge: 600 })]);
   }
 
   if (route === '/callback') {
-    const [expected, back] = (readCookies(req)[STATE] ?? '').split('.');
-    const target = safeReturn(decodeURIComponent(back ?? ''));
-    const clearState = cookie(STATE, '', req, { maxAge: 0 });
+    const st = await unseal(url.searchParams.get('state'), env.BASECAMP_CLIENT_SECRET);
     const code = url.searchParams.get('code');
-    if (!expected || url.searchParams.get('state') !== expected || !code) return redirect(withFlag(target, 'refused'), [clearState]);
+    const clearState = cookie(STATE, '', req, { maxAge: 0 });
+    if (!st || st.x < Date.now() || !code) return redirect(withFlag('/#ideas', 'refused'), [clearState]);
+    const here = st.o === url.origin;
+    if (!here && !allowedOrigin(st.o, req, env)) return redirect(withFlag('/#ideas', 'refused'), [clearState]);
+    const base = here ? '' : st.o;
+    if (here && readCookies(req)[STATE] !== st.n) return redirect(withFlag(st.b, 'refused'), [clearState]);
+    let t;
     try {
-      const t = await tokenRequest(
+      t = await tokenRequest(
         { type: 'web_server', client_id: env.BASECAMP_CLIENT_ID, client_secret: env.BASECAMP_CLIENT_SECRET, redirect_uri: redirectUri(req, env), code },
         fetchImpl,
       );
-      return redirect(target, [clearState, await sessionCookie(t, req, env)]);
     } catch {
-      return redirect(withFlag(target, 'failed'), [clearState]);
+      return redirect(`${base}${withFlag(st.b, 'failed')}`, here ? [clearState] : []);
     }
+    if (here) return redirect(st.b, [clearState, await sessionCookie(t, req, env)]);
+    // Hand the session over to the preview: sealed, bound to its nonce cookie, valid two minutes.
+    const handoff = await seal({ ...t, n: st.n, b: st.b, x: Date.now() + 120_000 }, env.BASECAMP_CLIENT_SECRET);
+    return redirect(`${st.o}${PREFIX}/adopt?${new URLSearchParams({ t: handoff })}`);
+  }
+
+  if (route === '/adopt') {
+    const h = await unseal(url.searchParams.get('t'), env.BASECAMP_CLIENT_SECRET);
+    const clearState = cookie(STATE, '', req, { maxAge: 0 });
+    if (!h?.a || h.x < Date.now() || readCookies(req)[STATE] !== h.n) return redirect(withFlag('/#ideas', 'refused'), [clearState]);
+    return redirect(safeReturn(h.b), [clearState, await sessionCookie(h, req, env)]);
   }
 
   if (route === '/logout') {

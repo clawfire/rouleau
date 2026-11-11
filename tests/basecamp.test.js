@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { areaTags, clip, effortLevel, htmlToLines, parseBoardUrl, parseFields, shortName, toIdea } from '../src/basecamp/idea.js';
-import { ALLOWED_PATH, handle, nextLink, readCookies, seal, unseal } from '../src/basecamp/oauth-core.js';
+import { ALLOWED_PATH, allowedOrigin, handle, nextLink, readCookies, seal, unseal } from '../src/basecamp/oauth-core.js';
 
 /* ---------- Card parsing ---------- */
 
@@ -116,10 +116,12 @@ test('login → callback → status → proxy, with paginated cards', async () =
   const stateCookie = cookieValue(login, 'rouleau_bc_state');
   assert.match(setCookies(login)[0], /HttpOnly; SameSite=Lax; Secure/);
 
-  // Wrong state: refused, no session.
-  const bad = await handle(new Request(`${ORIGIN}/api/basecamp/callback?code=c&state=nope`, { headers: { cookie: `rouleau_bc_state=${stateCookie}` } }), ENV);
-  assert.equal(bad.headers.get('location'), '/?basecamp=refused#ideas');
-  assert.equal(cookieValue(bad, 'rouleau_bc'), undefined);
+  // Forged state, or a real state without its nonce cookie (CSRF): refused, no session.
+  for (const [q, c] of [['nope', stateCookie], [encodeURIComponent(state), 'other']]) {
+    const bad = await handle(new Request(`${ORIGIN}/api/basecamp/callback?code=c&state=${q}`, { headers: { cookie: `rouleau_bc_state=${c}` } }), ENV);
+    assert.equal(bad.headers.get('location'), '/?basecamp=refused#ideas');
+    assert.equal(cookieValue(bad, 'rouleau_bc'), undefined);
+  }
 
   const f = fakeFetch([
     ['https://launchpad.37signals.com/authorization/token', tokens()],
@@ -127,7 +129,7 @@ test('login → callback → status → proxy, with paginated cards', async () =
     ['https://3.basecampapi.com/1/buckets/2/card_tables/lists/3/cards.json?page=2', () => Response.json([{ id: 'c3' }])],
     ['https://3.basecampapi.com/1/buckets/2/card_tables/lists/3/cards.json', () => Response.json([{ id: 'c1' }, { id: 'c2' }], { headers: { link: '<https://3.basecampapi.com/1/buckets/2/card_tables/lists/3/cards.json?page=2>; rel="next"' } })],
   ]);
-  const cb = await handle(new Request(`${ORIGIN}/api/basecamp/callback?code=c&state=${state}`, { headers: { cookie: `rouleau_bc_state=${stateCookie}` } }), ENV, f);
+  const cb = await handle(new Request(`${ORIGIN}/api/basecamp/callback?code=c&state=${encodeURIComponent(state)}`, { headers: { cookie: `rouleau_bc_state=${stateCookie}` } }), ENV, f);
   assert.equal(cb.headers.get('location'), '/#ideas');
   const exchange = new URL(f.calls[0].url);
   assert.equal(exchange.searchParams.get('type'), 'web_server');
@@ -176,7 +178,41 @@ test('logout clears the cookie, only by POST; unsafe return paths fall back', as
   const out = await handle(new Request(`${ORIGIN}/api/basecamp/logout`, { method: 'POST' }), ENV);
   assert.match(setCookies(out)[0], /^rouleau_bc=; .*Max-Age=0/);
   const login = await handle(new Request(`${ORIGIN}/api/basecamp/login?return=//evil.example`), ENV);
-  assert.match(decodeURIComponent(cookieValue(login, 'rouleau_bc_state').split('.')[1]), /^\/#ideas$/);
+  const st = await unseal(new URL(login.headers.get('location')).searchParams.get('state'), ENV.BASECAMP_CLIENT_SECRET);
+  assert.equal(st.b, '/#ideas');
+});
+
+test('deploy preview: login on the preview, callback on the main site, session adopted by the preview', async () => {
+  const env = { ...ENV, URL: 'https://rouleau-t02.netlify.app' };
+  const PREVIEW = 'https://deploy-preview-7--rouleau-t02.netlify.app';
+  const login = await handle(new Request(`${PREVIEW}/api/basecamp/login?return=/%23ideas`), env);
+  const auth = new URL(login.headers.get('location'));
+  assert.equal(auth.searchParams.get('redirect_uri'), 'https://rouleau-t02.netlify.app/api/basecamp/callback');
+  const nonce = cookieValue(login, 'rouleau_bc_state');
+
+  const f = fakeFetch([['https://launchpad.37signals.com/authorization/token', tokens('PA', 'PR')]]);
+  const cb = await handle(new Request(`https://rouleau-t02.netlify.app/api/basecamp/callback?code=c&state=${encodeURIComponent(auth.searchParams.get('state'))}`), env, f);
+  const adopt = new URL(cb.headers.get('location'));
+  assert.equal(adopt.origin, PREVIEW);
+  assert.equal(adopt.pathname, '/api/basecamp/adopt');
+  assert.equal(cookieValue(cb, 'rouleau_bc'), undefined, 'no session on the main site');
+
+  const noNonce = await handle(new Request(adopt), env);
+  assert.equal(noNonce.headers.get('location'), '/?basecamp=refused#ideas');
+  const ok = await handle(new Request(adopt, { headers: { cookie: `rouleau_bc_state=${nonce}` } }), env);
+  assert.equal(ok.headers.get('location'), '/#ideas');
+  assert.equal((await unseal(cookieValue(ok, 'rouleau_bc'), env.BASECAMP_CLIENT_SECRET)).a, 'PA');
+});
+
+test('allowedOrigin: the site and its previews only', () => {
+  const env = { ...ENV, URL: 'https://rouleau-t02.netlify.app' };
+  const req = new Request('https://rouleau-t02.netlify.app/api/basecamp/callback');
+  assert.ok(allowedOrigin('https://deploy-preview-7--rouleau-t02.netlify.app', req, env));
+  assert.ok(allowedOrigin('https://main--rouleau-t02.netlify.app', req, env));
+  assert.ok(!allowedOrigin('https://evil--rouleau-t02.netlify.app.evil.example', req, env));
+  assert.ok(!allowedOrigin('https://other.netlify.app', req, env));
+  assert.ok(!allowedOrigin('http://deploy-preview-7--rouleau-t02.netlify.app', req, env));
+  assert.ok(!allowedOrigin('https://x.netlify.app/path', req, env));
 });
 
 test('helpers', () => {
