@@ -70,6 +70,7 @@ export function renderAbout(container) {
           el('li', {}, ['Il n’y a pas de serveur Rouleau. Tes réglages, ta clé Hevy, tes adresses d’agenda et tes photos restent dans ce navigateur.']),
           el('li', {}, ['La météo interroge ', link('https://open-meteo.com', 'Open-Meteo'), ' avec la ville saisie ou ta position.']),
           el('li', {}, ['Hevy et ton agenda passent par un relais de l’hébergeur (Netlify), faute de pouvoir être appelés directement depuis une page web.']),
+          el('li', {}, ['Basecamp passe par une petite fonction Netlify (connexion OAuth, lecture seule des tableaux de cartes). Ses jetons restent dans un cookie chiffré que cette page ne peut pas lire.']),
           el('li', {}, ['Les polices et les icônes du thème sont chargées depuis des CDN (bunny.net et Font Awesome).']),
         ]),
       ),

@@ -2,7 +2,7 @@
 
 A small web app that generates things to print on a **Phomemo T02** thermal printer (48 mm paper, 384 dots, 203 dpi): font specimens today; morning tickets, workout sheets, task tickets, puzzles and more tomorrow.
 
-Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, no backend of its own (the Brutalist theme fonts and the icons load from CDNs; Hevy and calendar calls go through a Netlify rewrite).
+Built with vanilla JS, [Vite](https://vite.dev) and [Web Awesome Pro](https://webawesome.com) components (Brutalist theme). Everything is self-hosted and open source: no account, no tracking, no backend of its own (the Brutalist theme fonts and the icons load from CDNs; Hevy and calendar calls go through a Netlify rewrite, Basecamp through a small Netlify function for OAuth).
 
 ## Quick start
 
@@ -54,6 +54,7 @@ src/
 │   ├── qr.js          # Wi-Fi, vCard, URL, SMS, call… QR codes
 │   ├── bujo.js        # bullet journal: habit tracker, week, day, key
 │   ├── focus.js       # focus ticket: commitment, clock or ruler, parking lot
+│   ├── ideas.js       # Basecamp improvement ideas as desk tickets (+ ideas-draw.js)
 │   ├── badge.js       # sideways badges (+ badge-draw.js)
 │   └── oracle.js      # 8-ball, tarot, dice, fortune cookie (+ oracle-draw.js)
 ├── ui/controls.js     # control schema → Web Awesome form components
@@ -161,6 +162,15 @@ A commitment rather than a tracker: nothing to tick. One task, one way to know i
 - **Task** and **"Terminé quand…"** (the definition of done); left empty, they become lines to write on.
 - **Time**: duration (15 min to 4 h) and start time (empty = now). Drawn as a **Cadran** (a 12 h clock face with the committed stretch filled in, to read against the wall clock) or a **Règle** (an hour ruler with a bar at the real position of the block).
 - Optional **first move** (the 2-minute gesture that gets you started), **"Si je me disperse, je reviens à…"**, a **parking** for intrusive thoughts (*note it, come back*) and a signature line.
+
+### Idées d'amélioration (Basecamp)
+
+The cards of a Basecamp card table, printed as small desk tickets to keep them in sight: a light bulb, a rubber stamp with the card's column (*En cours*, *Acceptée*…), the title, the area as chips, **Le problème**, **L'impact attendu**, a drawn **effort** gauge (3 boxes), an outlined **À surveiller** box, lines for **Mon prochain pas**, who proposed it, and an optional QR code to open the card.
+
+- Pick **one card**, **l'idée du jour** (changes every day, seeded by the date: handy in the morning ticket) or **a whole column** (a cut line with scissors between tickets). Text *Court* (clipped paragraphs) or *Complet*.
+- Cards are read with the board's template, one `Label: value` per line: `Title`, `Area`, `Problem it solves`, `Rough effort`, `Expected impact`, `Anything I'd flag` (bold or not, a few French synonyms too). Free-form cards still print.
+- **Connection**: Basecamp only does OAuth, so the Netlify function `netlify/functions/basecamp.mjs` (logic in `src/basecamp/oauth-core.js`) runs the 37signals Launchpad flow and proxies **read-only** card table requests. The tokens sit in an HttpOnly cookie sealed with AES-GCM: page scripts never see them.
+- Setup: register an integration at [launchpad.37signals.com/integrations](https://launchpad.37signals.com/integrations) with the redirect URI `https://<your-site>/api/basecamp/callback`, then set `BASECAMP_CLIENT_ID` and `BASECAMP_CLIENT_SECRET` (secret) in Netlify. Deploy previews and branch deploys need nothing more: the OAuth callback always lands on the main site (Netlify's `URL`), which hands the session back to the preview through `/api/basecamp/adopt` (sealed, 2 minutes, bound to a cookie set by the preview's login). For `npm run dev`, a second integration with `http://localhost:8888/api/basecamp/callback` and `BASECAMP_REDIRECT_URI` set to it. Without a connection the preview uses demo ideas.
 
 ### Spécimen de fonts
 

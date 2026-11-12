@@ -18,6 +18,7 @@
  * stacks the `blocks` of several modules under a single footer. Modules with `composable: false`
  * (QR, sideways badges, dev tools) keep a plain `build`.
  *   panel?(container, { values, onChange })  replaces the generic controls (the morning ticket's composer)
+ *   group?: 'tasks'   task tickets (Basecamp ideas, GitHub / Jira soon) in their own collapsed section
  *   group?: 'bricks'  small building blocks (weather, agenda…) in their own collapsed section of the menu
  */
 import { footer } from './footer.js';
@@ -31,6 +32,7 @@ export const MODULES = [
   part('workout'),
   part('bujo'),
   part('focus'),
+  part('ideas'),
   part('colis'),
   part('qr'),
   part('badge'),
@@ -42,7 +44,7 @@ export const MODULES = [
   part('priorities'),
   part('quote'),
   part('specimen'),
-  { id: 'tasks', label: 'Tickets de tâches', icon: 'list-check', soon: true },
+  { id: 'tasks', label: 'GitHub / Jira', icon: 'code-branch', soon: true, group: 'tasks' },
 ];
 
 /** Pages of the menu that are not modules (nothing to print, no controls, no preview). */
